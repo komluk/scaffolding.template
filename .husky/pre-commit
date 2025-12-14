@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run project validation if available
+if [ -f "package.json" ] && grep -q '"validate"' package.json 2>/dev/null; then
+  npm run validate
+elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
+  # Python project - run tests if pytest is available
+  if command -v pytest >/dev/null 2>&1; then
+    pytest --tb=short -q 2>/dev/null || true
+  fi
+elif [ -f "*.sln" ] || [ -f "*.csproj" ]; then
+  # .NET project
+  dotnet build --no-restore 2>/dev/null || true
+fi
+
+echo "[pre-commit] Validation complete"

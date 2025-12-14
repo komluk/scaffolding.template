@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schema.claude.ai/settings.json",
+  "description": "Claude Code settings - AUTONOMOUS MODE",
+  "autoCompact": "instant",
+
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Task",
+      "TaskOutput",
+      "WebSearch",
+      "WebFetch",
+      "NotebookEdit",
+      "TodoWrite",
+      "AskUserQuestion",
+      "EnterPlanMode",
+      "ExitPlanMode",
+      "KillShell",
+      "mcp__*"
+    ],
+    "deny": []
+  },
+
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[Claude Code] Auto-compacting - context window full'",
+            "description": "Notify when auto-compact triggers"
+          }
+        ]
+      }
+    ]
+  }
+}
