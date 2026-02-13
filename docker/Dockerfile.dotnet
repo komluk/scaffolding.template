@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS builder
+WORKDIR /app
+COPY *.csproj ./
+RUN dotnet restore
+COPY . .
+ARG APP_NAME=App
+RUN dotnet publish -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
+WORKDIR /app
+RUN adduser -D appuser
+COPY --from=builder /app/publish .
+USER appuser
+EXPOSE 8080
+ARG APP_NAME=App
+ENV APP_DLL="${APP_NAME}.dll"
+ENTRYPOINT ["sh", "-c", "dotnet $APP_DLL"]
