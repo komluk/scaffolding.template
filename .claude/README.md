@@ -22,17 +22,11 @@ claude --dangerously-skip-permissions --no-interactive -p "your prompt"
 └── README.md        # This file
 ```
 
-## Adding Agents
+## Agents, Skills & Commands
 
-To add the full agent system, copy from agents.scaffolding:
+Agents, skills, commands, and templates are **inherited automatically** from the scaffolding platform via symlinks. No manual copying is needed — they are available to every project out of the box.
 
-```bash
-# Copy agents, skills, commands, templates
-cp -r path/to/agents.scaffolding/.claude/agents .claude/
-cp -r path/to/agents.scaffolding/.claude/skills .claude/
-cp -r path/to/agents.scaffolding/.claude/commands .claude/
-cp -r path/to/agents.scaffolding/.claude/templates .claude/
-```
+To add project-specific overrides, place files in `.claude/agents/`, `.claude/skills/`, or `.claude/commands/`.
 
 ## Resources
 

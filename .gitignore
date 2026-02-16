@@ -151,3 +151,9 @@ data/*.db
 # But exclude any temporary files
 .scaffolding/temp/
 .scaffolding/*.tmp
+
+# Runtime data (task logs, agent outputs, worktrees, memory)
+.scaffolding/conversations/
+.scaffolding/outputs/
+.scaffolding/worktrees/
+.scaffolding/memory/

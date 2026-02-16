@@ -3,7 +3,6 @@ WORKDIR /app
 COPY *.csproj ./
 RUN dotnet restore
 COPY . .
-ARG APP_NAME=App
 RUN dotnet publish -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
@@ -12,6 +11,6 @@ RUN adduser -D appuser
 COPY --from=builder /app/publish .
 USER appuser
 EXPOSE 8080
-ARG APP_NAME=App
-ENV APP_DLL="${APP_NAME}.dll"
-ENTRYPOINT ["sh", "-c", "dotnet $APP_DLL"]
+HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost:8080/health || exit 1
+ENTRYPOINT ["dotnet"]
+CMD ["App.dll"]
