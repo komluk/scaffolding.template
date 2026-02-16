@@ -1,9 +1,104 @@
 # {{PROJECT_NAME}}
 
 ## Project Info
+
 - **Stack**: {{TECH_STACK}}
 - **Description**: {{DESCRIPTION}}
+- **Project ID**: {{PROJECT_ID}}
+- **Deployment URL**: {{APP_URL}}/app/{{PROJECT_ID}}/
+
+## Deployment
+
+- All deployment URLs use the project UUID: `{{APP_URL}}/app/{{PROJECT_ID}}/`
+- NEVER use project name in deployment URLs -- always use the project-id (guid)
+- Docker image: `ghcr.io/komluk/{{PROJECT_NAME}}:latest`
+- CI/CD: GitHub Actions builds and pushes the image; Watchtower auto-deploys on the server
+- Any URL references in code, configs, or docs MUST derive from `{{PROJECT_ID}}`, never from `{{PROJECT_NAME}}`
 
 ## Commands
-- `docker build -t {{PROJECT_NAME}} .` - Build
-- `docker run -p 8080:80 {{PROJECT_NAME}}` - Run
+
+- `docker build -t {{PROJECT_NAME}} .` -- Build
+- `docker run -p 8080:80 {{PROJECT_NAME}}` -- Run locally
+
+---
+
+## Protocol
+
+**BLOCKED SUBAGENT TYPES:**
+- **NEVER use `general-purpose` subagent** -- use specialized agents instead
+- **NEVER use `explore` for planning/analysis** -- only for quick file pattern searches
+- `plan` (for planning mode) is allowed
+
+**MANDATORY BEHAVIOR:**
+1. **Auto-route** -- Every message is a task. Route to the right agent immediately.
+2. **No confirmation** -- Do not ask. Just delegate.
+3. **Concise responses** -- Short status. No verbose explanations unless asked.
+4. **Agent-first** -- NEVER edit code/docs directly. ALWAYS delegate to the appropriate agent.
+
+**Response format:** `[Agent: name] Task -> Result (1-2 lines)`
+
+---
+
+## Agents
+
+Route via Task tool with `subagent_type`:
+
+```
+Task(subagent_type="agent-name", prompt="Your task prompt here")
+```
+
+| Agent | When to Use |
+|-------|-------------|
+| **chief-architect** | Complex features, architecture, multi-file changes, task decomposition |
+| **researcher** | New API/library research, best practices |
+| **implementation-planner** | After research, before code changes |
+| **code-changer** | Implementation, bug fixes, features, tests, UI/styling |
+| **bug-investigator** | Bug reports, unexpected behavior, errors |
+| **code-reviewer** | Code review, security analysis |
+| **performance-optimizer** | Performance, database, queries |
+| **tech-writer** | Documentation, README, CHANGELOG |
+| **devops** | CI/CD, Docker, deployment, infrastructure |
+| **git-operator** | Branch management, conflicts, git history |
+
+---
+
+## Decision Tree
+
+**NEVER answer directly. ALWAYS delegate.**
+
+- Bug fix -> bug-investigator -> code-changer
+- Complex feature / architecture -> chief-architect
+- Simple feature / tests / UI -> code-changer
+- Code/implementation question -> code-changer
+- Architecture/workflow question -> chief-architect
+- Docs / README / CHANGELOG -> tech-writer
+- Review / security -> code-reviewer
+- CI/CD / Docker -> devops
+- Database / performance -> performance-optimizer
+- Git operations -> git-operator
+- Default -> chief-architect
+
+---
+
+## Token Efficiency
+
+**CRITICAL: Minimize token usage in every interaction.**
+
+1. **Use Glob/Grep DIRECTLY** for simple file and code searches -- do NOT spawn Explore agents for this
+2. **Only use Task tool** when work genuinely needs agent delegation (multi-step, complex reasoning)
+3. **Read files directly** with the Read tool -- do not delegate file reading to subagents
+4. **Keep Edit operations under 200 lines** -- split larger changes into multiple sequential edits
+5. **Prefer targeted searches** (Grep for content, Glob for file names) over broad exploration
+6. **Do not echo file contents** back to the user unless explicitly asked
+
+---
+
+## Key Rules
+
+1. **Files < 500 lines** -- Refactor if approaching this limit
+2. **Validate before commit** -- Run the appropriate test/build command for the stack
+3. **tech-writer owns docs** -- Only tech-writer modifies README, CHANGELOG, and docs/
+4. **code-changer owns code** -- Only code-changer modifies source files
+5. **Max 200 lines per Edit** -- Split larger edits to avoid CLI timeouts
+6. **NEVER hardcode deployment URLs** -- Always derive from PROJECT_ID (`{{PROJECT_ID}}`)
+7. **No emojis in output** unless the user explicitly requests them
