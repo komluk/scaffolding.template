@@ -144,16 +144,7 @@ data/*.db
 *.iml
 
 # =============================================================================
-# Scaffolding Tool
+# Scaffolding Tool (local platform data)
 # =============================================================================
 
-# Task logs should be committed (they're the project history)
-# But exclude any temporary files
-.scaffolding/temp/
-.scaffolding/*.tmp
-
-# Runtime data (task logs, agent outputs, worktrees, memory)
-.scaffolding/conversations/
-.scaffolding/outputs/
-.scaffolding/worktrees/
-.scaffolding/memory/
+.scaffolding/
