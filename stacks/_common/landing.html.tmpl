@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{PROJECT_NAME}}</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-surface: #111119;
+            --bg-elevated: #1a1a25;
+            --border: #1e1e2e;
+            --cyan: #00d4ff;
+            --green: #00ff88;
+            --text-primary: #f0f0f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --font-mono: 'Courier New', monospace;
+            --glow-cyan: rgba(0, 212, 255, 0.15);
+            --glow-green: rgba(0, 255, 136, 0.15);
+        }
+        body {
+            font-family: var(--font-mono);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 20% 0%, rgba(0,212,255,0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(0,255,136,0.03) 0%, transparent 50%);
+        }
+        .landing { max-width: 820px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+
+        /* -- Header -- */
+        .landing-header { text-align: center; padding: 3rem 0 2.5rem; }
+        .landing-title {
+            font-size: 2.4rem; font-weight: 700; margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .landing-badges { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 0.375rem;
+            padding: 0.3rem 0.85rem; border-radius: 999px;
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em;
+        }
+        .badge-stack { background: rgba(0,212,255,0.08); color: var(--cyan); border: 1px solid rgba(0,212,255,0.25); }
+        .badge-status { background: rgba(0,255,136,0.08); color: var(--green); border: 1px solid rgba(0,255,136,0.25); }
+        .status-dot {
+            display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .landing-description { color: var(--text-secondary); font-size: 0.95rem; max-width: 500px; margin: 0 auto; }
+
+        /* -- Shared -- */
+        .divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 2rem 0; }
+        .section { margin-bottom: 2rem; }
+        .section-title {
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.15em; color: var(--cyan); margin-bottom: 1rem;
+        }
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            border-color: rgba(0,212,255,0.3);
+            box-shadow: 0 0 20px rgba(0,212,255,0.06);
+        }
+
+        /* -- File tree -- */
+        .file-tree { list-style: none; }
+        .file-tree li {
+            display: flex; align-items: baseline; gap: 0.75rem;
+            padding: 0.45rem 0;
+            border-bottom: 1px solid rgba(30,30,46,0.6);
+            font-size: 0.85rem;
+        }
+        .file-tree li:last-child { border-bottom: none; }
+        .tree-prefix { color: var(--text-muted); user-select: none; min-width: 24px; }
+        .file-name { color: var(--cyan); white-space: nowrap; min-width: 150px; }
+        .file-desc { color: var(--text-secondary); font-size: 0.8rem; }
+
+        /* -- Steps -- */
+        .steps { list-style: none; counter-reset: step; }
+        .steps li {
+            counter-increment: step;
+            display: flex; align-items: flex-start; gap: 1rem;
+            padding: 0.6rem 0;
+        }
+        .steps li::before {
+            content: counter(step);
+            display: flex; align-items: center; justify-content: center;
+            min-width: 28px; height: 28px; border-radius: 50%;
+            background: var(--glow-cyan); color: var(--cyan);
+            font-size: 0.75rem; font-weight: 700;
+            border: 1px solid rgba(0,212,255,0.25);
+            flex-shrink: 0; margin-top: 0.1rem;
+        }
+        .step-text { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6; }
+        .step-text code {
+            background: rgba(0,212,255,0.07); color: var(--cyan);
+            padding: 0.15em 0.45em; border-radius: 4px; font-size: 0.8rem;
+        }
+
+        /* -- Endpoints -- */
+        .endpoint-method {
+            color: var(--green); font-weight: 600; min-width: 40px;
+        }
+
+        /* -- Pipeline -- */
+        .pipeline {
+            display: flex; align-items: center; gap: 0;
+            justify-content: center; flex-wrap: wrap; padding: 0.5rem 0;
+        }
+        .pipeline-step {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+        .pipeline-step .icon { font-size: 1rem; }
+        .pipeline-arrow { color: var(--text-muted); font-size: 1.1rem; padding: 0 0.3rem; }
+
+        /* -- Architecture -- */
+        .arch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+        .arch-item { text-align: center; padding: 1rem 0.5rem; }
+        .arch-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+        .arch-label { font-size: 0.75rem; color: var(--cyan); font-weight: 600; margin-bottom: 0.25rem; }
+        .arch-desc { font-size: 0.72rem; color: var(--text-muted); }
+
+        /* -- Footer -- */
+        .landing-footer {
+            text-align: center; padding: 1.5rem 0 0;
+            border-top: 1px solid var(--border); margin-top: 2.5rem;
+        }
+        .footer-text { font-size: 0.75rem; color: var(--text-muted); }
+        .footer-link { color: var(--cyan); text-decoration: none; }
+        .footer-link:hover { text-decoration: underline; }
+
+        /* -- Responsive -- */
+        @media (max-width: 640px) {
+            .landing { padding: 1.25rem 1rem 2rem; }
+            .landing-header { padding: 2rem 0 1.5rem; }
+            .landing-title { font-size: 1.6rem; }
+            .file-tree li { flex-direction: column; gap: 0.15rem; }
+            .file-name { min-width: auto; }
+            .pipeline { flex-direction: column; gap: 0.5rem; }
+            .pipeline-arrow { transform: rotate(90deg); }
+            .card { padding: 1rem; }
+            .arch-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body data-stack="{{TECH_STACK}}">
+    <div class="landing">
+        <header class="landing-header">
+            <h1 class="landing-title">{{PROJECT_NAME}}</h1>
+            <div class="landing-badges">
+                <span class="badge badge-stack" id="stack-badge"></span>
+                <span class="badge badge-status"><span class="status-dot"></span> Deployed</span>
+            </div>
+            <p class="landing-description">Your application is live and ready for development.</p>
+        </header>
+
+        <hr class="divider">
+
+        <!-- ===== Project Structure ===== -->
+        <section class="section">
+            <h2 class="section-title">// Project Structure</h2>
+            <div class="card">
+                <div class="stack-content" data-for="python">
+                    <ul class="file-tree">
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">main.py</span><span class="file-desc">FastAPI application and routes</span></li>
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">requirements.txt</span><span class="file-desc">Python dependencies</span></li>
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">Dockerfile</span><span class="file-desc">Container build instructions</span></li>
+                        <li><span class="tree-prefix">&#9492;&#9472;&#9472;</span><span class="file-name">landing.html</span><span class="file-desc">This landing page</span></li>
+                    </ul>
+                </div>
+                <div class="stack-content" data-for="node">
+                    <ul class="file-tree">
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">src/index.js</span><span class="file-desc">Express server and routes</span></li>
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">package.json</span><span class="file-desc">Dependencies and scripts</span></li>
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">Dockerfile</span><span class="file-desc">Container build instructions</span></li>
+                        <li><span class="tree-prefix">&#9492;&#9472;&#9472;</span><span class="file-name">landing.html</span><span class="file-desc">This landing page</span></li>
+                    </ul>
+                </div>
+                <div class="stack-content" data-for="go">
+                    <ul class="file-tree">
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">main.go</span><span class="file-desc">HTTP server and route handlers</span></li>
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">go.mod</span><span class="file-desc">Go module definition</span></li>
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">Dockerfile</span><span class="file-desc">Container build instructions</span></li>
+                        <li><span class="tree-prefix">&#9492;&#9472;&#9472;</span><span class="file-name">landing.html</span><span class="file-desc">This landing page (embedded at compile time)</span></li>
+                    </ul>
+                </div>
+                <div class="stack-content" data-for="dotnet">
+                    <ul class="file-tree">
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">Program.cs</span><span class="file-desc">Application entry point and routes</span></li>
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">App.csproj</span><span class="file-desc">Project configuration and dependencies</span></li>
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">Dockerfile</span><span class="file-desc">Container build instructions</span></li>
+                        <li><span class="tree-prefix">&#9492;&#9472;&#9472;</span><span class="file-name">landing.html</span><span class="file-desc">This landing page</span></li>
+                    </ul>
+                </div>
+                <div class="stack-content" data-for="react">
+                    <ul class="file-tree">
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">Dockerfile</span><span class="file-desc">Container build instructions</span></li>
+                        <li><span class="tree-prefix">&#9500;&#9472;&#9472;</span><span class="file-name">docker/nginx.conf</span><span class="file-desc">Nginx server configuration</span></li>
+                        <li><span class="tree-prefix">&#9492;&#9472;&#9472;</span><span class="file-name">landing.html</span><span class="file-desc">This landing page (served as index.html)</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Getting Started ===== -->
+        <section class="section">
+            <h2 class="section-title">// Getting Started</h2>
+            <div class="card">
+                <div class="stack-content" data-for="python">
+                    <ol class="steps">
+                        <li><span class="step-text">Edit <code>main.py</code> to add FastAPI routes</span></li>
+                        <li><span class="step-text">Install dependencies with <code>pip install -r requirements.txt</code></span></li>
+                        <li><span class="step-text">Run locally with <code>uvicorn main:app --reload</code></span></li>
+                        <li><span class="step-text">Push to <code>main</code> to trigger automatic deployment</span></li>
+                    </ol>
+                </div>
+                <div class="stack-content" data-for="node">
+                    <ol class="steps">
+                        <li><span class="step-text">Edit <code>src/index.js</code> to add Express routes</span></li>
+                        <li><span class="step-text">Install dependencies with <code>npm install</code></span></li>
+                        <li><span class="step-text">Run locally with <code>npm start</code></span></li>
+                        <li><span class="step-text">Push to <code>main</code> to trigger automatic deployment</span></li>
+                    </ol>
+                </div>
+                <div class="stack-content" data-for="go">
+                    <ol class="steps">
+                        <li><span class="step-text">Edit <code>main.go</code> to add http handlers</span></li>
+                        <li><span class="step-text">Resolve dependencies with <code>go mod tidy</code></span></li>
+                        <li><span class="step-text">Run locally with <code>go run main.go</code></span></li>
+                        <li><span class="step-text">Push to <code>main</code> to trigger automatic deployment</span></li>
+                    </ol>
+                </div>
+                <div class="stack-content" data-for="dotnet">
+                    <ol class="steps">
+                        <li><span class="step-text">Edit <code>Program.cs</code> to add endpoints</span></li>
+                        <li><span class="step-text">Restore packages with <code>dotnet restore</code></span></li>
+                        <li><span class="step-text">Run locally with <code>dotnet run</code></span></li>
+                        <li><span class="step-text">Push to <code>main</code> to trigger automatic deployment</span></li>
+                    </ol>
+                </div>
+                <div class="stack-content" data-for="react">
+                    <ol class="steps">
+                        <li><span class="step-text">Replace <code>landing.html</code> with your own content</span></li>
+                        <li><span class="step-text">Or add a full React, Vue, or Angular app</span></li>
+                        <li><span class="step-text">Push to <code>main</code> to trigger automatic deployment</span></li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== API Endpoints ===== -->
+        <section class="section">
+            <h2 class="section-title">// API Endpoints</h2>
+            <div class="card">
+                <div class="stack-content" data-for="python">
+                    <ul class="file-tree">
+                        <li><span class="endpoint-method">GET</span><span class="file-name">/</span><span class="file-desc">This landing page</span></li>
+                        <li><span class="endpoint-method">GET</span><span class="file-name">/health</span><span class="file-desc">Health check endpoint</span></li>
+                        <li><span class="endpoint-method">GET</span><span class="file-name">/docs</span><span class="file-desc">Interactive API documentation (Swagger)</span></li>
+                    </ul>
+                </div>
+                <div class="stack-content" data-for="node">
+                    <ul class="file-tree">
+                        <li><span class="endpoint-method">GET</span><span class="file-name">/</span><span class="file-desc">This landing page</span></li>
+                        <li><span class="endpoint-method">GET</span><span class="file-name">/health</span><span class="file-desc">Health check endpoint</span></li>
+                    </ul>
+                </div>
+                <div class="stack-content" data-for="go">
+                    <ul class="file-tree">
+                        <li><span class="endpoint-method">GET</span><span class="file-name">/</span><span class="file-desc">This landing page</span></li>
+                        <li><span class="endpoint-method">GET</span><span class="file-name">/health</span><span class="file-desc">Health check endpoint</span></li>
+                    </ul>
+                </div>
+                <div class="stack-content" data-for="dotnet">
+                    <ul class="file-tree">
+                        <li><span class="endpoint-method">GET</span><span class="file-name">/</span><span class="file-desc">This landing page</span></li>
+                        <li><span class="endpoint-method">GET</span><span class="file-name">/health</span><span class="file-desc">Health check endpoint</span></li>
+                    </ul>
+                </div>
+                <div class="stack-content" data-for="react">
+                    <ul class="file-tree">
+                        <li><span class="endpoint-method">GET</span><span class="file-name">/</span><span class="file-desc">This page (static file served by nginx)</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Deployment Pipeline ===== -->
+        <section class="section">
+            <h2 class="section-title">// Deployment Pipeline</h2>
+            <div class="card">
+                <div class="pipeline">
+                    <div class="pipeline-step"><span class="icon">&#8593;</span> git push</div>
+                    <span class="pipeline-arrow">&#8594;</span>
+                    <div class="pipeline-step"><span class="icon">&#9881;</span> CI Build</div>
+                    <span class="pipeline-arrow">&#8594;</span>
+                    <div class="pipeline-step"><span class="icon">&#128230;</span> Docker Image</div>
+                    <span class="pipeline-arrow">&#8594;</span>
+                    <div class="pipeline-step"><span class="icon">&#128065;</span> Watchtower</div>
+                    <span class="pipeline-arrow">&#8594;</span>
+                    <div class="pipeline-step"><span class="icon">&#9889;</span> Live</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Architecture ===== -->
+        <section class="section">
+            <h2 class="section-title">// Architecture</h2>
+            <div class="card">
+                <div class="arch-grid">
+                    <div class="arch-item">
+                        <div class="arch-icon">&#128230;</div>
+                        <div class="arch-label">Docker</div>
+                        <div class="arch-desc">Containerized application with automated builds</div>
+                    </div>
+                    <div class="arch-item">
+                        <div class="arch-icon">&#128065;</div>
+                        <div class="arch-label">Watchtower</div>
+                        <div class="arch-desc">Monitors for new images and auto-deploys</div>
+                    </div>
+                    <div class="arch-item">
+                        <div class="arch-icon">&#9889;</div>
+                        <div class="arch-label">Nginx</div>
+                        <div class="arch-desc">Reverse proxy routing traffic to your container</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="landing-footer">
+            <p class="footer-text">Powered by <a class="footer-link" href="https://github.com/komluk/scaffolding.tool" target="_blank" rel="noopener noreferrer">Scaffolding Tool</a></p>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            var stack = document.body.dataset.stack;
+            var labels = { python: 'Python', node: 'Node.js', go: 'Go', dotnet: '.NET', react: 'React' };
+            var badge = document.getElementById('stack-badge');
+            if (badge) badge.textContent = labels[stack] || stack;
+            document.querySelectorAll('.stack-content').forEach(function(el) {
+                if (el.dataset.for !== stack) el.style.display = 'none';
+            });
+        })();
+    </script>
+</body>
+</html>
