@@ -102,3 +102,27 @@ Task(subagent_type="agent-name", prompt="Your task prompt here")
 5. **Max 200 lines per Edit** -- Split larger edits to avoid CLI timeouts
 6. **NEVER hardcode deployment URLs** -- Always derive from PROJECT_ID (`{{PROJECT_ID}}`)
 7. **No emojis in output** unless the user explicitly requests them
+
+---
+
+## OpenSpec Integration
+
+Spec-driven development protocol. Specs stored in `.scaffolding/conversations/{conversation_id}/specs/` (proposal.md, design.md, tasks.md). Global config at `.scaffolding/openspec/`.
+
+**Artifact flow**: proposal.md -> design.md -> tasks.md -> implementation
+
+**Key directories**:
+- `.scaffolding/openspec/specs/` -- Living specifications (tracked in git)
+- `.scaffolding/openspec/schemas/` -- Schema definitions (tracked in git)
+- `.scaffolding/conversations/{id}/specs/` -- Per-conversation specs (ephemeral)
+
+**Available commands**:
+| Command | Purpose |
+|---------|---------|
+| `/opsx:new <name>` | Start a new spec-driven change |
+| `/opsx:ff <name>` | Fast-forward: generate all artifacts at once |
+| `/opsx:apply <name>` | Implement tasks from specs |
+| `/opsx:verify <name>` | Verify implementation matches specs |
+| `/opsx:archive <name>` | Archive completed conversation specs |
+
+Use `/workflow "description"` to run the full agent chain with OpenSpec artifacts.

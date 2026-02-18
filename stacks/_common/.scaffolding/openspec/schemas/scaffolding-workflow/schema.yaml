@@ -1,0 +1,117 @@
+name: scaffolding-workflow
+version: 2
+description: Maps OpenSpec artifacts to scaffolding.tool's 10-agent pipeline
+artifacts:
+  - id: proposal
+    generates: specs/proposal.md
+    description: Feature proposal with scope, acceptance criteria, and agent assignments
+    template: proposal.md
+    instruction: |
+      Create a proposal explaining WHY this change is needed.
+      Write to conversations/{conversation_id}/specs/proposal.md.
+
+      Sections:
+      - **Why**: 1-2 sentences on the problem or opportunity. What problem does this solve? Why now?
+      - **What Changes**: Bullet list of changes. Be specific about new capabilities, modifications, or removals. Mark breaking changes with **BREAKING**.
+      - **Capabilities**: Identify which specs will be created or modified:
+        - **New Capabilities**: List capabilities being introduced. Use kebab-case names (e.g., `user-auth`, `data-export`).
+        - **Modified Capabilities**: List existing capabilities whose REQUIREMENTS are changing. Only include if spec-level behavior changes (not just implementation details). Check `.scaffolding/openspec/specs/` for existing spec names. Leave empty if no requirement changes.
+      - **Impact**: Affected code, APIs, dependencies, or systems.
+      - **Agent Assignment**: Which agents from the 10-agent system are needed (chief-architect, researcher, implementation-planner, code-changer, code-reviewer, tech-writer, devops, performance-optimizer, bug-investigator, git-operator).
+      - **Rollback Plan**: How to revert if the change causes issues.
+
+      IMPORTANT: The Capabilities section is critical. It creates the contract between
+      proposal and design phases. Research existing specs before filling this in.
+
+      Keep it concise (1-2 pages). Focus on the "why" not the "how" -
+      implementation details belong in design.md.
+
+      This is the foundation - design and tasks build on this.
+      Agent: chief-architect
+    requires: []
+
+  - id: design
+    generates: specs/design.md
+    description: Scenarios, technical decisions, risks, and implementation approach
+    template: design.md
+    instruction: |
+      Create the design document that explains WHAT the system should do and HOW to implement it.
+      Write to conversations/{conversation_id}/specs/design.md.
+
+      This file consolidates specifications (Given/When/Then scenarios) and technical
+      decisions into a single document.
+
+      Sections:
+      - **Context**: Background, current state, constraints, stakeholders
+      - **Goals / Non-Goals**: What this design achieves and explicitly excludes
+      - **Specifications**: Requirements with Given/When/Then scenarios
+        - Each requirement: `### Requirement: <name>` followed by description
+        - Use SHALL/MUST for normative requirements (avoid should/may)
+        - Each scenario: `#### Scenario: <name>` with GIVEN/WHEN/THEN format
+        - Every requirement MUST have at least one scenario
+      - **Decisions**: Key technical choices with rationale (why X over Y?). Include alternatives considered for each decision.
+      - **Risks / Trade-offs**: Known limitations, things that could go wrong. Format: [Risk] -> Mitigation
+      - **Migration Plan**: Steps to deploy, rollback strategy (if applicable)
+      - **Open Questions**: Outstanding decisions or unknowns to resolve
+
+      Scaffolding.tool constraints:
+      - Max 200 lines per Edit operation (Large Edit Prevention)
+      - Files must stay under 500 lines
+      - Backend validation: pytest; Frontend validation: npm run validate
+      - Map implementation steps to specific workflow chain agents
+
+      Specs should be testable - each scenario is a potential test case.
+      Good design docs explain the "why" behind technical decisions.
+      Agent: implementation-planner (quality gate: score >= 85)
+    requires:
+      - proposal
+
+  - id: tasks
+    generates: specs/tasks.md
+    description: Implementation checklist with validation steps
+    template: tasks.md
+    instruction: |
+      Create the task list that breaks down the implementation work.
+      Write to conversations/{conversation_id}/specs/tasks.md.
+
+      **IMPORTANT: Follow the template below exactly.** The apply phase parses
+      checkbox format to track progress. Tasks not using `- [ ]` won't be tracked.
+
+      Guidelines:
+      - Group related tasks under ## numbered headings
+      - Each task MUST be a checkbox: `- [ ] X.Y Task description`
+      - Tasks should be small enough to complete in one session
+      - Order tasks by dependency (what must be done first?)
+      - Include a validation step in each group (pytest for backend, npm run validate for frontend)
+      - Max 200 lines per Edit operation
+      - Files must stay under 500 lines
+
+      Example:
+      ```
+      ## 1. Setup
+
+      - [ ] 1.1 Create new module structure
+      - [ ] 1.2 Add dependencies
+
+      ## 2. Core Implementation
+
+      - [ ] 2.1 Implement feature logic
+      - [ ] 2.2 Add unit tests
+      - [ ] 2.3 Run validation (pytest / npm run validate)
+      ```
+
+      Reference design.md for what needs to be built and how.
+      Each task should be verifiable - you know when it's done.
+      Agent: code-changer (quality gate: validation passes)
+    requires:
+      - design
+
+apply:
+  requires: [tasks]
+  tracks: specs/tasks.md
+  instruction: |
+    Read conversations/{conversation_id}/specs/ files, work through pending tasks, mark complete as you go.
+    Run validation after each significant change:
+    - Backend: source venv_linux/bin/activate && pytest
+    - Frontend: npm run validate
+    Pause if you hit blockers or need clarification.

@@ -144,7 +144,8 @@ data/*.db
 *.iml
 
 # =============================================================================
-# Scaffolding Tool (local platform data)
+# Scaffolding platform runtime data
 # =============================================================================
 
-.scaffolding/
+.scaffolding/*
+!.scaffolding/openspec/

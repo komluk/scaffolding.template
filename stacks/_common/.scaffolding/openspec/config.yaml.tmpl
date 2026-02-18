@@ -1,0 +1,22 @@
+# OpenSpec configuration for {{PROJECT_NAME}}
+# Spec-driven development with agent communication protocol
+
+project: {{PROJECT_NAME}}
+default_schema: scaffolding-workflow
+
+context: |
+  Project: {{PROJECT_NAME}}
+  Tech stack: {{TECH_STACK}}
+  Workflow: chief-architect -> researcher -> implementation-planner -> code-changer -> code-reviewer -> tech-writer
+
+rules:
+  proposal:
+    - Include rollback plan
+    - Reference affected agents
+  design:
+    - Use Given/When/Then format for scenarios
+    - Use SHALL/MUST for normative requirements
+  tasks:
+    - Include validation step per group
+    - Max 200 lines per Edit operation
+    - Files must stay under 500 lines
