@@ -35,8 +35,8 @@ Tracked in `.scaffolding/conversations/{conversation_id}/context.json`:
 |-------|-------|-------|--------|------|
 | 1. Research | researcher | requirements | `proposal.md` | score >= 80 |
 | 2. Design | implementation-planner | `proposal.md` | `design.md`, `tasks.md` | score >= 85 |
-| 3. Apply | code-changer | `tasks.md`, `design.md` | source code | validation passes |
-| 4. Verify | code-reviewer | `design.md`, `tasks.md` | review report | no criticals |
+| 3. Apply | developer | `tasks.md`, `design.md` | source code | validation passes |
+| 4. Verify | reviewer | `design.md`, `tasks.md` | review report | no criticals |
 
 ## When to Create vs Skip Specs
 
@@ -45,9 +45,9 @@ Tracked in `.scaffolding/conversations/{conversation_id}/context.json`:
 | New feature | Yes | Needs design, multi-file |
 | Architecture change | Yes | Needs decisions documented |
 | Multi-agent workflow | Yes | Needs coordination |
-| Bug fix (simple) | No | Direct to code-changer |
-| Typo / config tweak | No | Direct to code-changer |
-| Single-file refactor | No | Direct to code-changer |
+| Bug fix (simple) | No | Direct to developer |
+| Typo / config tweak | No | Direct to developer |
+| Single-file refactor | No | Direct to developer |
 
 ## Orchestration Steps
 
@@ -69,7 +69,7 @@ Tracked in `.scaffolding/conversations/{conversation_id}/context.json`:
   "status": "implementing",
   "created_at": "2026-01-15T10:00:00Z",
   "description": "Feature description",
-  "agents_involved": ["researcher", "implementation-planner", "code-changer"]
+  "agents_involved": ["researcher", "implementation-planner", "developer"]
 }
 ```
 

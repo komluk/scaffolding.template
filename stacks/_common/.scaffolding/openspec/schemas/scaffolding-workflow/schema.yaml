@@ -17,7 +17,7 @@ artifacts:
         - **New Capabilities**: List capabilities being introduced. Use kebab-case names (e.g., `user-auth`, `data-export`).
         - **Modified Capabilities**: List existing capabilities whose REQUIREMENTS are changing. Only include if spec-level behavior changes (not just implementation details). Check `.scaffolding/openspec/specs/` for existing spec names. Leave empty if no requirement changes.
       - **Impact**: Affected code, APIs, dependencies, or systems.
-      - **Agent Assignment**: Which agents from the 10-agent system are needed (chief-architect, researcher, implementation-planner, code-changer, code-reviewer, tech-writer, devops, performance-optimizer, bug-investigator, git-operator).
+      - **Agent Assignment**: Which agents from the 10-agent system are needed (architect, researcher, implementation-planner, developer, reviewer, tech-writer, devops, performance-optimizer, bug-investigator, git-operator).
       - **Rollback Plan**: How to revert if the change causes issues.
 
       IMPORTANT: The Capabilities section is critical. It creates the contract between
@@ -27,7 +27,7 @@ artifacts:
       implementation details belong in design.md.
 
       This is the foundation - design and tasks build on this.
-      Agent: chief-architect
+      Agent: architect
     requires: []
 
   - id: design
@@ -102,7 +102,7 @@ artifacts:
 
       Reference design.md for what needs to be built and how.
       Each task should be verifiable - you know when it's done.
-      Agent: code-changer (quality gate: validation passes)
+      Agent: developer (quality gate: validation passes)
     requires:
       - design
 

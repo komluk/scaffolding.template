@@ -95,7 +95,7 @@ When design.md specifies a technical choice, follow it:
 | Avoid | Instead |
 |-------|---------|
 | Skipping validation steps | Run tests after every group |
-| Modifying design.md content | Only code-reviewer or planner changes specs |
+| Modifying design.md content | Only reviewer or planner changes specs |
 | Implementing out of order | Follow dependency sequence |
 | Ignoring blocked tasks silently | Add explicit `> BLOCKED:` note |
 | Creating duplicate utilities | Search existing modules first |

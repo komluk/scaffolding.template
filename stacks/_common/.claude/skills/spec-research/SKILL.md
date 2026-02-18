@@ -77,8 +77,8 @@ This section creates the contract between proposal and design phases.
 |-------|------|-----------|
 | researcher | Analyst | proposal.md |
 | implementation-planner | Architect | design.md, tasks.md |
-| code-changer | Developer | Source code |
-| code-reviewer | Reviewer | Review report |
+| developer | Developer | Source code |
+| reviewer | Reviewer | Review report |
 
 ## Rollback Plan
 

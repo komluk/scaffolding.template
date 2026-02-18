@@ -49,12 +49,12 @@ Task(subagent_type="agent-name", prompt="Your task prompt here")
 
 | Agent | When to Use |
 |-------|-------------|
-| **chief-architect** | Complex features, architecture, multi-file changes, task decomposition |
+| **architect** | Complex features, architecture, multi-file changes, task decomposition |
 | **researcher** | New API/library research, best practices |
 | **implementation-planner** | After research, before code changes |
-| **code-changer** | Implementation, bug fixes, features, tests, UI/styling |
+| **developer** | Implementation, bug fixes, features, tests, UI/styling |
 | **bug-investigator** | Bug reports, unexpected behavior, errors |
-| **code-reviewer** | Code review, security analysis |
+| **reviewer** | Code review, security analysis |
 | **performance-optimizer** | Performance, database, queries |
 | **tech-writer** | Documentation, README, CHANGELOG |
 | **devops** | CI/CD, Docker, deployment, infrastructure |
@@ -66,17 +66,17 @@ Task(subagent_type="agent-name", prompt="Your task prompt here")
 
 **NEVER answer directly. ALWAYS delegate.**
 
-- Bug fix -> bug-investigator -> code-changer
-- Complex feature / architecture -> chief-architect
-- Simple feature / tests / UI -> code-changer
-- Code/implementation question -> code-changer
-- Architecture/workflow question -> chief-architect
+- Bug fix -> bug-investigator -> developer
+- Complex feature / architecture -> architect
+- Simple feature / tests / UI -> developer
+- Code/implementation question -> developer
+- Architecture/workflow question -> architect
 - Docs / README / CHANGELOG -> tech-writer
-- Review / security -> code-reviewer
+- Review / security -> reviewer
 - CI/CD / Docker -> devops
 - Database / performance -> performance-optimizer
 - Git operations -> git-operator
-- Default -> chief-architect
+- Default -> architect
 
 ---
 
@@ -98,7 +98,7 @@ Task(subagent_type="agent-name", prompt="Your task prompt here")
 1. **Files < 500 lines** -- Refactor if approaching this limit
 2. **Validate before commit** -- Run the appropriate test/build command for the stack
 3. **tech-writer owns docs** -- Only tech-writer modifies README, CHANGELOG, and docs/
-4. **code-changer owns code** -- Only code-changer modifies source files
+4. **developer owns code** -- Only developer modifies source files
 5. **Max 200 lines per Edit** -- Split larger edits to avoid CLI timeouts
 6. **NEVER hardcode deployment URLs** -- Always derive from PROJECT_ID (`{{PROJECT_ID}}`)
 7. **No emojis in output** unless the user explicitly requests them
