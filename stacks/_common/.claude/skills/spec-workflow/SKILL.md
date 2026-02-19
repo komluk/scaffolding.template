@@ -12,8 +12,8 @@ Spec-driven development protocol for coordinating multi-agent workflows.
 ```
 .scaffolding/conversations/{conversation_id}/specs/
   proposal.md   -- WHY (researcher)
-  design.md     -- WHAT + HOW (implementation-planner)
-  tasks.md      -- checklist (implementation-planner)
+  design.md     -- WHAT + HOW (architect)
+  tasks.md      -- checklist (architect)
 ```
 
 ## Status Lifecycle
@@ -34,7 +34,7 @@ Tracked in `.scaffolding/conversations/{conversation_id}/context.json`:
 | Phase | Agent | Reads | Writes | Gate |
 |-------|-------|-------|--------|------|
 | 1. Research | researcher | requirements | `proposal.md` | score >= 80 |
-| 2. Design | implementation-planner | `proposal.md` | `design.md`, `tasks.md` | score >= 85 |
+| 2. Design | architect | `proposal.md` | `design.md`, `tasks.md` | score >= 85 |
 | 3. Apply | developer | `tasks.md`, `design.md` | source code | validation passes |
 | 4. Verify | reviewer | `design.md`, `tasks.md` | review report | no criticals |
 
@@ -69,7 +69,7 @@ Tracked in `.scaffolding/conversations/{conversation_id}/context.json`:
   "status": "implementing",
   "created_at": "2026-01-15T10:00:00Z",
   "description": "Feature description",
-  "agents_involved": ["researcher", "implementation-planner", "developer"]
+  "agents_involved": ["researcher", "architect", "developer"]
 }
 ```
 

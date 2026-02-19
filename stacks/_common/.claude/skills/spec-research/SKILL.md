@@ -76,7 +76,7 @@ This section creates the contract between proposal and design phases.
 | Agent | Role | Artifacts |
 |-------|------|-----------|
 | researcher | Analyst | proposal.md |
-| implementation-planner | Architect | design.md, tasks.md |
+| architect | Architect | design.md, tasks.md |
 | developer | Developer | Source code |
 | reviewer | Reviewer | Review report |
 

@@ -27,7 +27,7 @@
 | Agent | Role | Artifacts |
 |-------|------|-----------|
 | researcher | Analyst | proposal.md |
-| implementation-planner | Architect | specs/**/*.md, design.md, tasks.md |
+| architect | Architect | specs/**/*.md, design.md, tasks.md |
 | developer | Developer | Source code |
 | reviewer | Reviewer | Review report |
 
