@@ -1,0 +1,118 @@
+name: Build Init Images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'stacks/**'
+  workflow_dispatch:
+    inputs:
+      stack:
+        description: 'Stack to build (leave empty for all)'
+        required: false
+        type: choice
+        options:
+          - all
+          - react
+          - node
+          - python
+          - go
+          - dotnet
+        default: all
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GHCR_ORG: komluk
+
+jobs:
+  build:
+    name: Build ${{ matrix.stack }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        stack: [react, node, python, go, dotnet]
+
+    steps:
+      - name: Check if stack matches filter
+        id: filter
+        run: |
+          FILTER="${{ github.event.inputs.stack }}"
+          STACK="${{ matrix.stack }}"
+          if [[ "${{ github.event_name }}" == "push" || -z "${FILTER}" || "${FILTER}" == "all" || "${FILTER}" == "${STACK}" ]]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping ${STACK} (filter: ${FILTER})"
+          fi
+
+      - name: Checkout repository
+        if: steps.filter.outputs.skip != 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        if: steps.filter.outputs.skip != 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        if: steps.filter.outputs.skip != 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USER }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Prepare build context
+        if: steps.filter.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          BUILD_DIR=$(mktemp -d)
+          echo "BUILD_DIR=${BUILD_DIR}" >> "$GITHUB_ENV"
+
+          # Copy common files first
+          cp -a stacks/_common/. "${BUILD_DIR}/"
+
+          # Copy stack-specific files (overrides common)
+          cp -a "stacks/${{ matrix.stack }}/." "${BUILD_DIR}/"
+
+          # Process .tmpl files: replace placeholders and remove .tmpl extension
+          find "${BUILD_DIR}" -name '*.tmpl' -type f -print0 | while IFS= read -r -d '' tmpl_file; do
+            output_file="${tmpl_file%.tmpl}"
+            sed \
+              -e 's/{{PROJECT_NAME}}/New Project/g' \
+              -e 's/{{TECH_STACK}}/${{ matrix.stack }}/g' \
+              -e 's/{{DESCRIPTION}}/A scaffolded application/g' \
+              -e 's/{{PROJECT_ID}}/00000000-0000-0000-0000-000000000000/g' \
+              -e 's|{{APP_URL}}|https://example.com|g' \
+              "${tmpl_file}" > "${output_file}"
+            rm -f "${tmpl_file}"
+          done
+
+          echo "Build context prepared at ${BUILD_DIR}:"
+          ls -la "${BUILD_DIR}"
+
+      - name: Generate package-lock.json
+        if: steps.filter.outputs.skip != 'true' && (matrix.stack == 'node' || matrix.stack == 'react')
+        run: |
+          if [ -f "${BUILD_DIR}/package.json" ]; then
+            echo "Generating package-lock.json for ${{ matrix.stack }}..."
+            cd "${BUILD_DIR}"
+            npm install --package-lock-only --ignore-scripts
+          fi
+
+      - name: Build and push image
+        if: steps.filter.outputs.skip != 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.BUILD_DIR }}
+          push: true
+          tags: ghcr.io/${{ env.GHCR_ORG }}/scaffolding-init-${{ matrix.stack }}:latest
+          cache-from: type=gha,scope=init-${{ matrix.stack }}
+          cache-to: type=gha,mode=max,scope=init-${{ matrix.stack }}
+
+      - name: Clean up build dir
+        if: always() && steps.filter.outputs.skip != 'true'
+        run: rm -rf "${BUILD_DIR}"
