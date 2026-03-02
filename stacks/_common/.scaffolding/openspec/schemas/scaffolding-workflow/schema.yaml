@@ -1,6 +1,6 @@
 name: scaffolding-workflow
 version: 2
-description: Maps OpenSpec artifacts to scaffolding.tool's 9-agent pipeline
+description: Maps OpenSpec artifacts to scaffolding.tool's 10-agent pipeline
 artifacts:
   - id: proposal
     generates: specs/proposal.md
@@ -17,7 +17,7 @@ artifacts:
         - **New Capabilities**: List capabilities being introduced. Use kebab-case names (e.g., `user-auth`, `data-export`).
         - **Modified Capabilities**: List existing capabilities whose REQUIREMENTS are changing. Only include if spec-level behavior changes (not just implementation details). Check `.scaffolding/openspec/specs/` for existing spec names. Leave empty if no requirement changes.
       - **Impact**: Affected code, APIs, dependencies, or systems.
-      - **Agent Assignment**: Which agents from the 9-agent system are needed (architect, researcher, developer, reviewer, tech-writer, devops, performance-optimizer, debugger, gitops).
+      - **Agent Assignment**: Which agents from the 10-agent system are needed (analyst, architect, researcher, developer, reviewer, tech-writer, devops, performance-optimizer, debugger, gitops).
       - **Rollback Plan**: How to revert if the change causes issues.
 
       IMPORTANT: The Capabilities section is critical. It creates the contract between
@@ -27,7 +27,7 @@ artifacts:
       implementation details belong in design.md.
 
       This is the foundation - design and tasks build on this.
-      Agent: architect
+      Agent: architect (delegates to researcher only when external research is needed)
     requires: []
 
   - id: design
@@ -102,7 +102,7 @@ artifacts:
 
       Reference design.md for what needs to be built and how.
       Each task should be verifiable - you know when it's done.
-      Agent: developer (quality gate: validation passes)
+      Agent: architect (quality gate: validation passes)
     requires:
       - design
 
@@ -112,6 +112,6 @@ apply:
   instruction: |
     Read conversations/{conversation_id}/specs/ files, work through pending tasks, mark complete as you go.
     Run validation after each significant change:
-    - Backend: source venv_linux/bin/activate && pytest
+    - Backend: source venv/bin/activate && pytest
     - Frontend: npm run validate
     Pause if you hit blockers or need clarification.

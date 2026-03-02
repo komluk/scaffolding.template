@@ -15,6 +15,8 @@ Guide for implementing code changes driven by `tasks.md`.
 | `{specs_path}/design.md` | Architecture decisions | Reference during implementation |
 | `{specs_path}/proposal.md` | Context and motivation | Reference if unclear on intent |
 
+**Path Enforcement**: The `specs_path` MUST be `.scaffolding/conversations/{UUID}/specs/` where `{UUID}` is a valid UUID (format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`). NEVER use descriptive folder names.
+
 ## Execution Protocol
 
 ### Step 1: Read tasks.md

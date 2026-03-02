@@ -7,11 +7,15 @@ description: "OpenSpec lifecycle orchestration for /workflow chains"
 
 Spec-driven development protocol for coordinating multi-agent workflows.
 
+## UUID Enforcement
+
+**CRITICAL**: The `conversation_id` MUST always be a UUID (format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`). NEVER use descriptive names, slugs, or human-readable strings. If no UUID is available, generate one with `uuidgen` or `python3 -c "import uuid; print(uuid.uuid4())"`. Self-check: does the conversation_id match the pattern `[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`? If not, STOP and use a real UUID.
+
 ## Directory Structure
 
 ```
 .scaffolding/conversations/{conversation_id}/specs/
-  proposal.md   -- WHY (researcher)
+  proposal.md   -- WHY + WHAT (analyst)
   design.md     -- WHAT + HOW (architect)
   tasks.md      -- checklist (architect)
 ```
@@ -33,10 +37,26 @@ Tracked in `.scaffolding/conversations/{conversation_id}/context.json`:
 
 | Phase | Agent | Reads | Writes | Gate |
 |-------|-------|-------|--------|------|
-| 1. Research | researcher | requirements | `proposal.md` | score >= 80 |
+| 1. Analyze | analyst | requirements | `proposal.md` | proposal written |
+| 1b. Research (conditional) | researcher | requirements | ResearchPack | score >= 80 |
 | 2. Design | architect | `proposal.md` | `design.md`, `tasks.md` | score >= 85 |
 | 3. Apply | developer | `tasks.md`, `design.md` | source code | validation passes |
 | 4. Verify | reviewer | `design.md`, `tasks.md` | review report | no criticals |
+
+## When Researcher Is Needed
+
+Analyst flags need for research in proposal.md. Researcher is invoked ONLY when the task involves:
+- New external API integration (e.g., Stripe, Twilio)
+- Unfamiliar library not yet in the project
+- Best practices requiring current internet research
+- Version-specific documentation for upgrades/migrations
+
+Analyst writes proposal directly (no researcher) for:
+- Internal codebase refactoring
+- UI/styling changes
+- Bug fixes with known root cause
+- Configuration changes
+- Features using only existing project dependencies
 
 ## When to Create vs Skip Specs
 
@@ -51,15 +71,15 @@ Tracked in `.scaffolding/conversations/{conversation_id}/context.json`:
 
 ## Orchestration Steps
 
-1. **Create specs directory**: `mkdir -p .scaffolding/conversations/{conversation_id}/specs/`
-2. **Set specs_path**: `.scaffolding/conversations/{conversation_id}/specs/`
-3. **Pass specs_path** in every agent delegation prompt:
-   ```
-   Specs path: .scaffolding/conversations/{conversation_id}/specs/
-   Write your output to {specs_path}/proposal.md
-   ```
-4. **Update context.json** status after each phase transition
-5. **Gate enforcement**: Block next phase if quality gate fails
+1. **Obtain conversation_id UUID**: From prompt context or generate via `uuidgen`. **MUST be a UUID, never a descriptive name.**
+2. **Create specs directory**: `mkdir -p .scaffolding/conversations/{conversation_id}/specs/`
+3. **Set specs_path**: `.scaffolding/conversations/{conversation_id}/specs/`
+4. **Analyst writes proposal.md** (requirements, scope, impact, feasibility)
+5. **If research needed**: analyst flags in proposal.md, researcher is invoked (score >= 80)
+6. **Architect writes design.md + tasks.md** (incorporating proposal.md and ResearchPack if available)
+7. **Pass specs_path** in every agent delegation prompt
+8. **Update context.json** status after each phase transition
+9. **Gate enforcement**: Block next phase if quality gate fails
 
 ## Context JSON Schema
 
@@ -69,12 +89,12 @@ Tracked in `.scaffolding/conversations/{conversation_id}/context.json`:
   "status": "implementing",
   "created_at": "2026-01-15T10:00:00Z",
   "description": "Feature description",
-  "agents_involved": ["researcher", "architect", "developer"]
+  "agents_involved": ["architect", "developer"]
 }
 ```
 
 ## Schema Reference
 
-Custom schema: `.scaffolding/openspec/schemas/` (project-specific)
+Custom schema: `.scaffolding/openspec/schemas/scaffolding-workflow/schema.yaml`
 Config: `.scaffolding/openspec/config.yaml`
-Templates: `.scaffolding/openspec/schemas/templates/` (if configured)
+Templates: `.scaffolding/openspec/schemas/scaffolding-workflow/templates/`

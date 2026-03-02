@@ -18,15 +18,30 @@ claude --dangerously-skip-permissions --no-interactive -p "your prompt"
 
 ```
 .claude/
+├── agents/          # 10 specialized agent definitions
+├── skills/          # 21+ universal skills (auto-injected via frontmatter)
+├── commands/        # 15 slash commands (workflow, OpenSpec, utilities)
+│   └── specs/       # OpenSpec spec-driven development commands
+├── hooks/           # Hook scripts (post-edit-review, pre-commit-validation)
+├── templates/       # Reference templates (output frontmatter, overviews)
+├── validators/      # Validation scripts (circuit-breaker, output validation)
+├── output-styles/   # Output formatting (clean-reports)
 ├── settings.json    # Project-level Claude settings
 └── README.md        # This file
 ```
 
-## Agents, Skills & Commands
+## Agents
 
-Agents, skills, commands, and templates are **inherited automatically** from the scaffolding platform via symlinks. No manual copying is needed — they are available to every project out of the box.
+All 10 agents are available via `Task(subagent_type="agent-name")`:
+analyst, architect, researcher, developer, debugger, reviewer, performance-optimizer, tech-writer, devops, gitops.
 
-To add project-specific overrides, place files in `.claude/agents/`, `.claude/skills/`, or `.claude/commands/`.
+## Skills
+
+Skills are auto-injected into agents via `skills:` frontmatter in agent definitions. To add project-specific skills, create a new directory in `.claude/skills/` with a `SKILL.md` file.
+
+## Commands
+
+Use `/workflow "description"` for the full agent chain, or `/specs:new`, `/specs:ff`, etc. for spec-driven development.
 
 ## Resources
 

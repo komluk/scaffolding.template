@@ -39,7 +39,7 @@
 
 ---
 
-## Agents
+## Agents (10)
 
 Route via Task tool with `subagent_type`:
 
@@ -49,15 +49,16 @@ Task(subagent_type="agent-name", prompt="Your task prompt here")
 
 | Agent | When to Use |
 |-------|-------------|
-| **architect** | Complex features, architecture, multi-file changes, task decomposition, planning |
-| **researcher** | New API/library research, best practices |
-| **developer** | Implementation, bug fixes, features, tests, UI/styling |
+| **analyst** | Ambiguous requests, requirements, scope assessment, feasibility, proposal writing |
+| **architect** | System design, API design, implementation planning, multi-file refactoring, agent orchestration |
+| **researcher** | New API integration, library questions, best practices (gate: score >= 80) |
+| **developer** | Implementation, bug fixes, features, tests, UI/styling (gate: validation passes) |
 | **debugger** | Bug reports, unexpected behavior, errors |
-| **reviewer** | Code review, security analysis |
-| **performance-optimizer** | Performance, database, queries |
-| **tech-writer** | Documentation, README, CHANGELOG |
-| **devops** | CI/CD, Docker, deployment, infrastructure |
-| **gitops** | Branch management, conflicts, git history |
+| **reviewer** | After code changes, security analysis, threat modeling (gate: no criticals) |
+| **performance-optimizer** | Performance issues, database design, schema, migrations, queries |
+| **tech-writer** | Documentation, CHANGELOG updates |
+| **devops** | CI/CD, deployment, infrastructure |
+| **gitops** | Branch management, conflict resolution, git history, worktree recovery, push to remote |
 
 ---
 
@@ -66,29 +67,27 @@ Task(subagent_type="agent-name", prompt="Your task prompt here")
 **NEVER answer directly. ALWAYS delegate.**
 
 - Bug fix -> debugger -> developer
-- Complex feature / architecture -> architect
+- Complex feature -> analyst (proposal) -> architect (design) -> developer
 - Simple feature / tests / UI -> developer
 - Code/implementation question -> developer
-- Architecture/workflow question -> architect
-- Docs / README / CHANGELOG -> tech-writer
+- Architecture/technical question -> architect
+- Requirements / scope / feasibility -> analyst
+- Docs / usage / library -> researcher -> tech-writer
+- Planning / ambiguous request -> analyst
 - Review / security -> reviewer
-- CI/CD / Docker -> devops
+- CI/CD -> devops
 - Database / performance -> performance-optimizer
-- Git operations -> gitops
-- Default -> architect
+- Git operations / worktree / commit -> gitops
+- Default -> analyst
 
 ---
 
-## Token Efficiency
+## Workflow Chain
 
-**CRITICAL: Minimize token usage in every interaction.**
+`/workflow "description"` runs:
+analyst (proposal.md) -> researcher (conditional, >=80) -> architect (design.md + tasks.md, >=85) -> developer (validate) -> reviewer -> tech-writer -> gitops (push)
 
-1. **Use Glob/Grep DIRECTLY** for simple file and code searches -- do NOT spawn Explore agents for this
-2. **Only use Task tool** when work genuinely needs agent delegation (multi-step, complex reasoning)
-3. **Read files directly** with the Read tool -- do not delegate file reading to subagents
-4. **Keep Edit operations under 200 lines** -- split larger changes into multiple sequential edits
-5. **Prefer targeted searches** (Grep for content, Glob for file names) over broad exploration
-6. **Do not echo file contents** back to the user unless explicitly asked
+Analyst writes proposal.md (requirements, scope, impact). Architect writes design.md and tasks.md (technical design, implementation plan). Researcher is invoked ONLY when external research is needed (new API, unfamiliar library, best practices). When OpenSpec is initialized (`.scaffolding/openspec/` exists), `/workflow` uses artifact-based IPC between agents.
 
 ---
 
@@ -104,9 +103,60 @@ Task(subagent_type="agent-name", prompt="Your task prompt here")
 
 ---
 
-## OpenSpec Integration
+## Delegation Format
 
-Spec-driven development protocol. Specs stored in `.scaffolding/conversations/{conversation_id}/specs/` (proposal.md, design.md, tasks.md). Global config at `.scaffolding/openspec/`.
+Use Task tool with subagent_type parameter:
+
+```python
+Task(
+    subagent_type="developer",
+    prompt="Update Button.tsx to add onClick handler",
+    description="Add click handler"
+)
+```
+
+**Available subagent_type values:**
+- analyst, architect, researcher, developer
+- debugger, reviewer, performance-optimizer, tech-writer, devops, gitops
+
+**Note:** Backend uses `--dangerously-skip-permissions` so Task tool subagents have full Edit/Write access.
+
+---
+
+## Large Edit Prevention
+
+**CRITICAL: Avoid large edits that crash Claude CLI**
+
+| Rule | Limit | Action |
+|------|-------|--------|
+| **Max lines per Edit** | 200 lines | Split into multiple smaller edits |
+| **Max new file size** | 300 lines | Create incrementally or use template |
+| **Complex refactoring** | Any size | Use multiple sequential edits |
+
+**When editing large files:**
+1. Read the file first to understand structure
+2. Plan edits as a sequence of small changes (max 200 lines each)
+3. Execute edits one at a time, verifying after each
+4. If edit > 200 lines, STOP and decompose
+
+**Why:** Large single edits (400+ lines) can cause Claude CLI to timeout or crash without cleanup, leaving tasks stuck in "running" state.
+
+---
+
+## Skills, Commands & Hooks
+
+- **Skills** (`.claude/skills/`): Auto-injected via `skills:` frontmatter. No manual loading needed.
+- **Commands** (`.claude/commands/`): Use `/workflow run <name> <desc>` for explicit workflow selection.
+- **Hooks** (`settings.json`): `SessionStart(compact)`, `PostToolUse(Edit|Write)`, `PreToolUse(git commit)`.
+- **Guardrails** (frontmatter): `maxTurns` (15-50), `disallowedTools`, `memory: project`.
+
+---
+
+## OpenSpec & Specs Path
+
+Spec-driven development. Specs stored in `.scaffolding/conversations/{conversation_id}/specs/` (proposal.md, design.md, tasks.md). Global config at `.scaffolding/openspec/`.
+
+**CRITICAL:** `conversation_id` MUST be a UUID (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`). NEVER use human-readable names. Path: `.scaffolding/conversations/{UUID}/specs/`. If no CONVERSATION_ID provided, generate one with `uuidgen`.
 
 **Artifact flow**: proposal.md -> design.md -> tasks.md -> implementation
 
@@ -118,10 +168,18 @@ Spec-driven development protocol. Specs stored in `.scaffolding/conversations/{c
 **Available commands**:
 | Command | Purpose |
 |---------|---------|
-| `/opsx:new <name>` | Start a new spec-driven change |
-| `/opsx:ff <name>` | Fast-forward: generate all artifacts at once |
-| `/opsx:apply <name>` | Implement tasks from specs |
-| `/opsx:verify <name>` | Verify implementation matches specs |
-| `/opsx:archive <name>` | Archive completed conversation specs |
+| `/specs:new <name>` | Start a new spec-driven change |
+| `/specs:ff <name>` | Fast-forward: generate all artifacts at once |
+| `/specs:apply <name>` | Implement tasks from specs |
+| `/specs:verify <name>` | Verify implementation matches specs |
+| `/specs:archive <name>` | Archive completed conversation specs |
 
 Use `/workflow "description"` to run the full agent chain with OpenSpec artifacts.
+
+---
+
+## References
+
+- [Architecture](docs/architecture.md) -- system overview, task execution, storage
+- [Agent Memory](docs/agent-memory.md) -- 3-tier memory architecture
+- [OpenSpec](docs/openspec.md) -- spec-driven development protocol

@@ -1,0 +1,153 @@
+# {{PROJECT_NAME}} - Claude Code Configuration
+
+<!--
+  TEMPLATE INSTRUCTIONS:
+  1. Copy this file to your project root as CLAUDE.md
+  2. Replace {{PROJECT_NAME}} with your actual project name
+  3. Update Technology Stack section with your actual technologies
+  4. Customize Quick Reference commands for your project
+  5. Remove this comment block
+-->
+
+## Communication Protocol
+
+**MANDATORY BEHAVIOR - Apply to EVERY user message:**
+
+1. **Auto-route** - Treat every user message as a task. Route to appropriate agent immediately.
+2. **No confirmation** - Don't ask "should I use agent X?" Just do it.
+3. **Concise responses** - Short status updates. No verbose explanations unless asked.
+4. **Agent-first** - NEVER edit code/docs directly. ALWAYS delegate to agents.
+
+**Response format:**
+```
+[Agent: name] Task description
+→ Result summary (1-2 lines)
+```
+
+**Multi-step tasks:** Use TaskCreate to create tasks, then execute agents sequentially.
+
+---
+
+## Quick Reference
+
+| Action | Command |
+|--------|---------|
+| Claude (autonomous) | `claude --dangerously-skip-permissions` |
+| Validate (Frontend) | `cd frontend && npm run validate` |
+| Validate (Python) | `pytest` |
+| Validate (.NET) | `dotnet build && dotnet test` |
+
+## Agent-Based Development
+
+**ALWAYS use agents via Task tool. NEVER edit code directly.**
+
+```
+Task(subagent_type="agent-name", prompt="Your task")
+```
+
+### Decision Tree
+
+```
+Is this CODE? -YES-> Bug fix? -YES-> debugger -> developer
+              |               └-NO-> developer (includes UI, tests)
+              └-NO-> DOCS? -YES-> tech-writer
+                     └-NO-> RESEARCH? -YES-> researcher
+                            └-NO-> REVIEW? -YES-> reviewer (includes security)
+                                   └-NO-> CI/CD? -YES-> devops
+                                          └-NO-> DATABASE/PERF? -YES-> performance-optimizer
+                                                 └-NO-> architect (includes API design)
+```
+
+### Agent Selection Guide
+
+| Task | Agent |
+|------|-------|
+| Add/fix code, implement features | `developer` |
+| Debug failing test | `debugger` |
+| UI/styling changes | `developer` |
+| All testing (unit, E2E) | `developer` |
+| Update README/CHANGELOG/docs | `tech-writer` |
+| Research library/API | `researcher` |
+| Review PR/code/security | `reviewer` |
+| Threat modeling, compliance | `reviewer` |
+| CI/CD, Docker | `devops` |
+| Complex multi-agent task | `architect` |
+| API design, OpenAPI | `architect` |
+| Create plan from research | `architect` |
+| Performance, database, queries | `performance-optimizer` |
+
+## Project Structure
+
+```
+/.claude/          - Agents, skills, commands, templates
+/docs/             - Documentation
+/app/
+  /backend/        - Backend application (FastAPI/Python)
+  /frontend/       - Frontend application (React/Vue)
+```
+
+## Technology Stack
+
+<!-- Update this section with your actual technologies -->
+
+| Layer | Technologies |
+|-------|--------------|
+| Frontend | React, TypeScript, Vite |
+| Backend (Python) | FastAPI, SQLAlchemy, Pydantic, pytest |
+| Backend (.NET) | .NET, ASP.NET Core, EF Core, xUnit |
+| Database | PostgreSQL |
+
+## Quality Gates
+
+| Phase | Requirement | Owner |
+|-------|-------------|-------|
+| Research | Score >= 80 | researcher |
+| Planning | Score >= 85 | architect |
+| Implementation | Validation passes | developer |
+| Review | No critical issues | reviewer |
+| Documentation | CHANGELOG updated | tech-writer |
+
+## Key Rules
+
+1. **Use agents** - Route ALL tasks via Task tool
+2. **Sequential agents** - Run sequentially when editing same files
+3. **Files < 500 lines** - Refactor if approaching limit
+4. **Types in types/index.ts** - Centralized TypeScript types
+5. **Validate before commit** - Run validation command for your stack
+6. **tech-writer owns docs** - Only tech-writer modifies README/CHANGELOG
+7. **developer owns code** - Only developer modifies source files
+
+## Context Management
+
+**Auto-compact triggers at ~95% context usage.** For long-running tasks:
+
+| Situation | Action |
+|-----------|--------|
+| Before large task | Run `/compact` proactively |
+| After completing major milestone | Run `/compact` to free context |
+| Context warning appears | System will auto-compact |
+| Subagent returns large output | Summarize key points, discard verbose logs |
+
+**Best practices for agents:**
+- Break large tasks into smaller subtasks via Task tool
+- Subagents have independent context - use them for isolated work
+- Return concise summaries, not full outputs
+- Use TaskCreate/TaskUpdate to track progress (persists across compacts)
+
+## Documentation
+
+| Resource | Path |
+|----------|------|
+| Agents Overview | .claude/templates/agents-overview.md |
+| Skills Overview | .claude/templates/skills-overview.md |
+| Responsibilities | .claude/templates/responsibility-matrix.md |
+
+## Slash Commands
+
+| Command | Description |
+|---------|-------------|
+| `/code-review` | Code quality review |
+| `/security-review` | Security audit |
+| `/test-coverage` | Test coverage analysis |
+| `/implement-feature` | Feature workflow |
+| `/research` | API/library research |

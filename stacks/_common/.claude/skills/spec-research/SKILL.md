@@ -11,6 +11,8 @@ Guide for creating `proposal.md` -- the WHY document that anchors the entire wor
 
 Write to: `{specs_path}/proposal.md`
 
+**Path Enforcement**: The `specs_path` MUST be `.scaffolding/conversations/{UUID}/specs/` where `{UUID}` is a valid UUID (format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`). NEVER use descriptive folder names.
+
 ## Required Sections
 
 | Section | Purpose | Content |
@@ -75,8 +77,8 @@ This section creates the contract between proposal and design phases.
 
 | Agent | Role | Artifacts |
 |-------|------|-----------|
-| researcher | Analyst | proposal.md |
-| architect | Architect | design.md, tasks.md |
+| architect | Analyst + Coordinator | proposal.md, design.md, tasks.md |
+| researcher | External Research (if needed) | ResearchPack |
 | developer | Developer | Source code |
 | reviewer | Reviewer | Review report |
 
