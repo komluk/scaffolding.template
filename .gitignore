@@ -149,3 +149,4 @@ data/*.db
 
 .scaffolding/*
 !.scaffolding/openspec/
+!.scaffolding/agent-memory/
