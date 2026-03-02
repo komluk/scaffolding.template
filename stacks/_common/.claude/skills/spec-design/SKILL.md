@@ -11,6 +11,8 @@ Guide for creating `design.md` (WHAT + HOW) and `tasks.md` (implementation check
 
 Read `{specs_path}/proposal.md` first. Reference its capabilities and impact sections.
 
+**Path Enforcement**: The `specs_path` MUST be `.scaffolding/conversations/{UUID}/specs/` where `{UUID}` is a valid UUID (format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`). NEVER use descriptive folder names.
+
 ## design.md
 
 ### Output Path
@@ -59,12 +61,12 @@ Rules:
 **Rationale**: Sub-millisecond lookups, built-in TTL, already in stack
 ```
 
-### Implementation Constraints
+### Scaffolding Constraints
 
 Include in all designs:
 - Max 200 lines per Edit operation
 - Files must stay under 500 lines
-- Include project-specific validation commands per group
+- Backend validation: `pytest`; Frontend: `npm run validate`
 - Map steps to specific workflow chain agents
 
 ## tasks.md
@@ -82,26 +84,26 @@ Write to: `{specs_path}/tasks.md`
 | Dependency order | Tasks ordered by what must come first |
 | File paths | Include target file path in task |
 | Acceptance criteria | Each task independently verifiable |
-| Validation step | Include project validation command per group |
+| Validation step | Include `pytest` / `npm run validate` per group |
 | Size | Each task completable in one session |
 
 ### Template
 
 ```markdown
 ## 1. Setup
-- [ ] 1.1 Create module/package structure for the feature
-- [ ] 1.2 Add dependencies to project manifest
+- [ ] 1.1 Create `app/backend/app/feature/` module structure
+- [ ] 1.2 Add dependencies to `requirements.txt`
 
 ## 2. Core Implementation
-- [ ] 2.1 Implement service/business logic
-- [ ] 2.2 Add data models/schemas
-- [ ] 2.3 Add API routes/endpoints
+- [ ] 2.1 Implement service in `app/backend/app/feature/service.py`
+- [ ] 2.2 Add Pydantic schemas in `app/backend/app/feature/schemas.py`
+- [ ] 2.3 Add router in `app/backend/app/feature/router.py`
 - [ ] 2.4 Run validation: `<project validation command>`
 
 ## 3. Frontend + Tests
-- [ ] 3.1 Add types/interfaces
+- [ ] 3.1 Add types to `app/frontend/src/types/index.ts`
 - [ ] 3.2 Create component, add unit + integration tests
-- [ ] 3.3 Run validation: `<project validation command>`
+- [ ] 3.3 Run validation: `npm run validate && pytest`
 ```
 
 ## Quality Checklist

@@ -15,6 +15,8 @@ Guide for verifying that implementation matches spec artifacts.
 | `{specs_path}/tasks.md` | Yes | Completion checklist |
 | `{specs_path}/proposal.md` | Optional | Original intent reference |
 
+**Path Enforcement**: The `specs_path` MUST be `.scaffolding/conversations/{UUID}/specs/` where `{UUID}` is a valid UUID (format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`). NEVER use descriptive folder names.
+
 ## Three Verification Dimensions
 
 ### 1. Completeness
