@@ -18,16 +18,16 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
             backend:
               - 'app/backend/**'
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: steps.filter.outputs.backend == 'true'
         with:
           python-version: '3.11'
@@ -40,7 +40,7 @@ jobs:
           pip install --upgrade pip
           pip install pytest-cov -r requirements.txt
           pytest --cov=. --cov-report=xml:coverage.xml
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: steps.filter.outputs.backend == 'true'
         with:
           name: backend-coverage
@@ -54,10 +54,10 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
@@ -78,19 +78,38 @@ jobs:
           npm run lint
           npm run test:coverage
           npm run build
+      - uses: actions/upload-artifact@v7
+        if: steps.filter.outputs.frontend == 'true'
+        with:
+          name: frontend-coverage
+          path: app/frontend/coverage/lcov.info
+          retention-days: 7
+          if-no-files-found: ignore
     outputs:
       changed: ${{ steps.filter.outputs.frontend }}
 
   quality-gate:
     name: SonarQube Analysis
     needs: [backend, frontend]
-    if: needs.backend.outputs.changed == 'true' || needs.frontend.outputs.changed == 'true'
+    if: always()
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: SonarSource/sonarqube-scan-action@v6
+      - name: Download backend coverage
+        continue-on-error: true
+        uses: actions/download-artifact@v7
+        with:
+          name: backend-coverage
+          path: app/backend
+      - name: Download frontend coverage
+        continue-on-error: true
+        uses: actions/download-artifact@v7
+        with:
+          name: frontend-coverage
+          path: app/frontend/coverage
+      - uses: SonarSource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
