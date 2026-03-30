@@ -12,7 +12,7 @@
 - All deployment URLs use the project UUID: `{{APP_URL}}/app/{{PROJECT_ID}}/`
 - NEVER use project name in deployment URLs -- always use the project-id (guid)
 - Docker image: `ghcr.io/komluk/{{PROJECT_NAME}}:latest`
-- CI/CD: GitHub Actions builds and pushes the image; Watchtower auto-deploys on the server
+- CI/CD: GitHub Actions builds and pushes the image; Coolify webhook triggers redeployment
 - Any URL references in code, configs, or docs MUST derive from `{{PROJECT_ID}}`, never from `{{PROJECT_NAME}}`
 
 ## Commands
