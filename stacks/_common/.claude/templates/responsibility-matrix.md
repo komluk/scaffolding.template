@@ -22,7 +22,7 @@ Clear ownership assignments to prevent overlap and confusion.
 | Unit tests | developer |
 | Integration tests | developer |
 | E2E tests | developer |
-| Performance testing | performance-optimizer |
+| Performance testing | optimizer |
 | Test adequacy check | reviewer |
 
 ---
@@ -60,11 +60,11 @@ Clear ownership assignments to prevent overlap and confusion.
 
 | Task | Owner |
 |------|-------|
-| Schema design | performance-optimizer |
-| Migration planning | performance-optimizer |
-| Query optimization | performance-optimizer |
-| Performance analysis | performance-optimizer |
-| Bottleneck identification | performance-optimizer |
+| Schema design | optimizer |
+| Migration planning | optimizer |
+| Query optimization | optimizer |
+| Performance analysis | optimizer |
+| Bottleneck identification | optimizer |
 | Implementation | developer |
 
 ### API
@@ -142,18 +142,21 @@ researcher → architect (plan) → developer
 
 ---
 
-## Summary: All 8 Agents
+## Summary: All 11 Agents
 
 | Agent | Primary Focus | Does NOT Do |
 |-------|---------------|-------------|
+| **analyst** | Requirements, scope, feasibility, proposals | Code changes, design |
 | **architect** | Task routing, orchestration, architecture, API design, implementation planning | Code changes |
+| **coordinator** | Dynamic task decomposition into agent step plans | Code changes |
 | **researcher** | Documentation research | Planning, coding |
 | **developer** | Write code, all tests, UI/styling | Docs, architecture |
 | **debugger** | Root cause analysis | Fix implementation |
 | **reviewer** | All reviews, security, threat modeling | Writing code |
-| **performance-optimizer** | Performance, database design, queries | Code changes |
+| **optimizer** | Performance, database design, queries | Code changes |
 | **tech-writer** | All documentation | Code changes |
 | **devops** | CI/CD, infrastructure | Feature implementation |
+| **gitops** | Branch management, commit/merge/push, worktree recovery | Feature implementation |
 
 ---
 
@@ -164,8 +167,8 @@ researcher → architect (plan) → developer
 | Error handling | architect | reviewer | developer |
 | Logging | architect | reviewer | developer |
 | Security | reviewer | reviewer | developer |
-| Performance | performance-optimizer | reviewer | developer |
-| Database | performance-optimizer | reviewer | developer |
+| Performance | optimizer | reviewer | developer |
+| Database | optimizer | reviewer | developer |
 | API design | architect | reviewer | developer |
 
 ---
@@ -173,6 +176,6 @@ researcher → architect (plan) → developer
 ## Conflict Resolution
 
 When agents disagree:
-1. **Architecture vs Performance**: architect decides, performance-optimizer advises
+1. **Architecture vs Performance**: architect decides, optimizer advises
 2. **Security vs Usability**: reviewer decides with user input
 3. **Speed vs Quality**: reviewer enforces quality gates

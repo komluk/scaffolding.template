@@ -1,6 +1,6 @@
 ---
 name: github-actions-template
-description: GitHub Actions CI pipeline templates and workflow patterns for this project
+description: "GitHub Actions CI pipeline templates and workflow YAML patterns. TRIGGER when: creating or editing a CI workflow, adding a CI job, or wiring build/test/deploy steps. SKIP: container build internals (use docker-templates); local git workflow (use git-operations)."
 ---
 
 ## Standard CI Pipeline
@@ -22,7 +22,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -33,7 +33,7 @@ jobs:
   type-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -44,7 +44,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -56,14 +56,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint, type-check, test]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
       - run: npm run build
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v4
         with:
           name: build
           path: dist/

@@ -1,6 +1,6 @@
 ---
 name: spec-develop
-description: "How to execute OpenSpec tasks.md during implementation"
+description: "Execute an OpenSpec tasks.md during implementation. TRIGGER when: working through spec task checkboxes and applying code changes. SKIP: authoring the tasks.md (use spec-design); verifying the result (use spec-review)."
 ---
 
 # OpenSpec Apply (Task Execution)
@@ -34,8 +34,11 @@ For each task (`- [ ] N.M description`):
 
 ### Step 3: Run validation after each group
 
-Run the project's configured validation/test command after each group.
-Check CLAUDE.md or the project README for the specific commands.
+| Stack | Validation Command |
+|-------|--------------------|
+| Backend | `pytest` |
+| Frontend | `npm run validate` |
+| Both | Run both commands |
 
 ### Step 4: Handle blockers
 
@@ -58,7 +61,7 @@ Continue with unblocked tasks. Do not stop the entire chain.
 | Never modify specs | Only modify tasks.md checkboxes, never change spec content |
 | Validate per group | Run tests after each task group |
 | Note blockers | Add `> BLOCKED:` note, skip and continue |
-| Search before write | Check existing utilities and shared modules before creating helpers |
+| Search before write | Check `core/utils/`, `core/exceptions.py` before creating helpers |
 
 ## Progress Tracking
 
@@ -67,11 +70,11 @@ Continue with unblocked tasks. Do not stop the entire chain.
 ```markdown
 ## 2. Core Implementation
 
-- [x] 2.1 Implement service logic
-- [x] 2.2 Add data models/schemas
-- [ ] 2.3 Add API routes/endpoints
+- [x] 2.1 Implement service in `./backend/service.py`
+- [x] 2.2 Add Pydantic schemas in `./backend/schemas.py`
+- [ ] 2.3 Add router in `./backend/router.py`
   > BLOCKED: Waiting for auth middleware decision
-- [x] 2.4 Run validation: `<project validation command>`
+- [x] 2.4 Run validation: `pytest`
 ```
 
 ### Resuming after interruption
@@ -90,7 +93,7 @@ When design.md specifies a technical choice, follow it:
 | "Use Repository pattern" | Create repository class, not inline queries |
 | "Use Pydantic v2 model_validator" | Use `@model_validator`, not `@validator` |
 | "Max 500 lines per file" | Split if approaching limit |
-| "Existing utility in shared module" | Import it, do not recreate |
+| "Existing utility in core/utils" | Import it, do not recreate |
 
 ## Anti-Patterns
 
@@ -100,4 +103,4 @@ When design.md specifies a technical choice, follow it:
 | Modifying design.md content | Only reviewer or planner changes specs |
 | Implementing out of order | Follow dependency sequence |
 | Ignoring blocked tasks silently | Add explicit `> BLOCKED:` note |
-| Creating duplicate utilities | Search existing modules first |
+| Creating duplicate utilities | Search `core/` first |

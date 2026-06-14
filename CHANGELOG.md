@@ -6,10 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Agent Roster 10 -> 11** (2026-06-14)
+  - Renamed the performance optimizer agent file to `optimizer` across all agent definitions, templates, validators, and docs
+  - Added `coordinator` agent (task decomposition / multi-agent orchestration), bringing the roster to 11 agents
+
 ### Added
 
 - **10 Agent Definitions** (2026-03-02)
-  - Added all 10 specialized agents to `stacks/_common/.claude/agents/`: analyst, architect, researcher, developer, debugger, reviewer, performance-optimizer, tech-writer, devops, gitops
+  - Added all 11 specialized agents to `stacks/_common/.claude/agents/`: analyst, architect, researcher, developer, debugger, reviewer, optimizer, tech-writer, devops, gitops, coordinator
   - All agents genericized: no platform-specific paths, no hardcoded MCP servers, portable venv references
   - Each agent includes responsibility boundaries, output format templates, and quality gate criteria
 

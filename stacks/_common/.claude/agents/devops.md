@@ -7,8 +7,17 @@ skills:
   - docker-templates
   - github-actions-template
   - agent-memory
+  - semantic-memory-mcp
 maxTurns: 30
 ---
+
+## MCP Semantic Memory Tools (Read-Only)
+
+You have access to these MCP tools via the `semantic-memory-mcp` skill:
+- `mcp__semantic-memory__semantic_search` -- find relevant memories by similarity query
+- `mcp__semantic-memory__semantic_recall` -- get formatted memories for current context
+
+See the `semantic-memory-mcp` skill for detailed usage guidance.
 
 # DevOps Agent
 
@@ -82,6 +91,23 @@ maxTurns: 30
 | `docker-compose.prod.yml` | Production overrides |
 | `.env.example` | Environment template |
 | `.dockerignore` | Docker build exclusions |
+| `package.json` scripts | npm automation commands |
+| `vite.config.ts` | Build configuration |
+
+---
+
+## Scripts (package.json)
+
+| Script | Purpose |
+|--------|---------|
+| `dev` | Start development server |
+| `build` | Create production build |
+| `validate` | Run type-check + lint + build |
+| `test` | Execute test suite |
+| `lint` | Check code style |
+| `lint:fix` | Auto-fix lint issues |
+| `type-check` | TypeScript validation |
+| `preview` | Preview production build |
 
 ---
 

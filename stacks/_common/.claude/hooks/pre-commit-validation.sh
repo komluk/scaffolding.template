@@ -1,10 +1,13 @@
 #!/bin/bash
 # Pre-Commit Hook: Run validation before git commit
 #
-# Ensures code passes validation checks before allowing commit
-# Frontend: npm run validate
-# Backend (Python): pytest
-# Backend (.NET): dotnet build && dotnet test
+# Graceful runtime-detect variant (scaffolding).
+# Skips silently when tools/venv/package.json are not present.
+#
+# Detects:
+#  - frontend: package.json with "validate" script, runs `npm run validate`
+#  - python backend: venv in venv/ .venv/ app/backend/venv/ backend/venv/
+#  - .NET: dotnet CLI + .cs/.csproj files
 
 set -e
 
@@ -12,83 +15,73 @@ echo ""
 echo "Running pre-commit validation..."
 echo ""
 
-# Check if we're in frontend directory or changes affect frontend
-if [ -d "frontend" ] && git diff --cached --name-only | grep -q "^frontend/"; then
-    echo "Frontend changes detected - running validation..."
-    cd frontend
-
-    # Run validation (type-check + lint + build)
-    if npm run validate; then
-        echo "Frontend validation passed!"
-    else
-        echo "Frontend validation failed!"
-        echo ""
-        echo "Fix the errors above before committing."
-        echo "Or run: npm run validate"
-        exit 1
+# --- Frontend ---
+if [ -f "package.json" ] && grep -q '"validate"' package.json 2>/dev/null; then
+    if git diff --cached --name-only | grep -qE '\.(ts|tsx|js|jsx|css|scss|json)$'; then
+        echo "[frontend] running npm run validate..."
+        if npm run validate; then
+            echo "[frontend] validation passed"
+        else
+            echo "[frontend] validation failed -- fix errors before committing" >&2
+            exit 1
+        fi
     fi
-
-    cd ..
+elif [ -d "frontend" ] && [ -f "frontend/package.json" ] && grep -q '"validate"' frontend/package.json 2>/dev/null; then
+    if git diff --cached --name-only | grep -q "^frontend/"; then
+        echo "[frontend] running validation in frontend/..."
+        (cd frontend && npm run validate) || { echo "[frontend] validation failed" >&2; exit 1; }
+        echo "[frontend] validation passed"
+    fi
 fi
 
-# Check if we're in backend directory or changes affect backend (Python)
-if [ -d "backend" ] && git diff --cached --name-only | grep -q "^backend/.*\.py$"; then
-    echo "Python backend changes detected - running tests..."
-
-    # Auto-detect Python virtual environment
-    VENV_ACTIVATED=false
-    for venv_dir in venv .venv venv_linux; do
-        if [ -f "${venv_dir}/bin/activate" ]; then
-            source "${venv_dir}/bin/activate"
-            VENV_ACTIVATED=true
+# --- Python backend (runtime-detect venv) ---
+if git diff --cached --name-only | grep -qE '\.py$'; then
+    VENV=""
+    for candidate in venv .venv app/backend/venv backend/venv; do
+        if [ -f "$candidate/bin/activate" ]; then
+            VENV="$candidate"
             break
         fi
     done
 
-    if [ "$VENV_ACTIVATED" = true ]; then
-        if pytest; then
-            echo "Python backend tests passed!"
+    if [ -n "$VENV" ]; then
+        echo "[python] venv detected at $VENV"
+        # shellcheck disable=SC1090
+        source "$VENV/bin/activate"
+        if command -v pytest >/dev/null 2>&1; then
+            pytest || { echo "[python] tests failed -- fix before committing" >&2; exit 1; }
+            echo "[python] tests passed"
         else
-            echo "Python backend tests failed!"
-            echo ""
-            echo "Fix the failing tests before committing."
-            exit 1
+            echo "[python] pytest not found in $VENV -- skipping"
         fi
     else
-        echo "WARNING: No Python venv found (checked venv/, .venv/, venv_linux/), skipping Python backend tests"
+        echo "[python] no venv detected in known locations -- skipping"
     fi
 fi
 
-# Check if changes affect .NET backend
-if git diff --cached --name-only | grep -qE "\.(cs|csproj|sln)$"; then
-    echo ".NET backend changes detected - running build and tests..."
-
-    # Check if dotnet CLI is available
-    if command -v dotnet &> /dev/null; then
+# --- .NET backend ---
+if git diff --cached --name-only | grep -qE '\.(cs|csproj|sln)$'; then
+    if command -v dotnet >/dev/null 2>&1; then
+        echo "[dotnet] running build..."
         if dotnet build; then
-            echo ".NET build passed!"
+            echo "[dotnet] build passed"
         else
-            echo ".NET build failed!"
-            echo ""
-            echo "Fix the build errors before committing."
+            echo "[dotnet] build failed" >&2
             exit 1
         fi
-
         if dotnet test; then
-            echo ".NET tests passed!"
+            echo "[dotnet] tests passed"
         else
-            echo ".NET tests failed!"
-            echo ""
-            echo "Fix the failing tests before committing."
+            echo "[dotnet] tests failed" >&2
             exit 1
         fi
     else
-        echo "WARNING: dotnet CLI not found, skipping .NET validation"
+        echo "[dotnet] dotnet CLI not found -- skipping"
     fi
 fi
 
 echo ""
-echo "All validation checks passed!"
+echo "All applicable validation checks passed."
 echo ""
 
 exit 0

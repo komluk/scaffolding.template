@@ -1,8 +1,8 @@
 # Specialized Agents Overview
 
-The agent system comprises **10 specialized agents** organized across three operational tiers.
+The agent system comprises **11 specialized agents** organized across three operational tiers.
 
-## Tier 1: Orchestration (2 Agents)
+## Tier 1: Orchestration (3 Agents)
 
 ### analyst
 Requirements analyst for ambiguous requests. Interprets user intent, decomposes requirements, writes proposal.md, performs scope assessment and feasibility checks. Routes to the correct downstream agent.
@@ -18,6 +18,13 @@ Master coordinator for complex, multi-faceted projects. Decomposes requirements 
 **Tools**: Read, Glob, Grep, Task, WebSearch
 **Output**: Task breakdown, agent assignments, dependency graph, API specifications, ImplementationPlan with file list, steps, rollback strategy
 **Quality Gate (planning)**: Score >= 85 to proceed to implementation
+
+### coordinator
+Dynamic task decomposer. Analyzes a task and produces a JSON execution plan that sequences other agents into steps. May fan out parallel-safe steps directly. Never recurses into another coordinator.
+
+**Triggers**: Multi-agent coordination, dynamic task decomposition
+**Tools**: Read, Glob, Grep, Task
+**Output**: JSON `{"steps": [...]}` execution plan
 
 ## Tier 2: Core Development (4 Agents)
 
@@ -52,9 +59,9 @@ Comprehensive code review and security specialist. Handles all review types: qua
 **Output**: Review report with findings, security analysis, STRIDE assessment
 **Commands**: /code-review, /security-review, /test-coverage
 
-## Tier 3: Specialized (3 Agents)
+## Tier 3: Specialized (4 Agents)
 
-### performance-optimizer
+### optimizer
 Performance and database specialist. Handles profiling, benchmarking, query optimization, schema design, migrations, and bottleneck identification.
 
 **Triggers**: Performance issues, database design, schema changes, migration planning, query optimization
@@ -75,6 +82,13 @@ CI/CD and infrastructure specialist. Manages pipelines, deployment, environment 
 **Tools**: Bash, Read, Write, Edit
 **Output**: Pipeline configurations, deployment scripts
 
+### gitops
+Git operations specialist. Owns branch management, conflict resolution, git history, worktree recovery, commit/merge, and pushing to remote.
+
+**Triggers**: Git operations, worktree commit/merge/push, conflict resolution, history cleanup
+**Tools**: Bash, Read, Glob, Grep
+**Output**: Committed/merged/pushed branches, resolved conflicts, recovered worktrees
+
 ---
 
 ## Quality Gates
@@ -94,8 +108,8 @@ CI/CD and infrastructure specialist. Manages pipelines, deployment, environment 
 | New feature (simple) | developer | reviewer |
 | Bug fix | debugger | developer → reviewer |
 | Refactoring | architect | architect (plan) → developer → reviewer |
-| Performance issue | performance-optimizer | developer |
-| Database design | performance-optimizer | developer |
+| Performance issue | optimizer | developer |
+| Database design | optimizer | developer |
 | API design | architect | developer |
 | Security review | reviewer | - |
 | Threat modeling | reviewer | - |
@@ -105,16 +119,21 @@ CI/CD and infrastructure specialist. Manages pipelines, deployment, environment 
 | Code review | reviewer | - |
 | Research | researcher | - |
 | CI/CD | devops | - |
+| Git operations / push | gitops | - |
+| Multi-agent coordination | coordinator | - |
 
 ## Files
 
 | Agent | File |
 |-------|------|
+| analyst | .claude/agents/analyst.md |
 | architect | .claude/agents/architect.md |
+| coordinator | .claude/agents/coordinator.md |
 | researcher | .claude/agents/researcher.md |
 | developer | .claude/agents/developer.md |
 | debugger | .claude/agents/debugger.md |
 | reviewer | .claude/agents/reviewer.md |
-| performance-optimizer | .claude/agents/performance-optimizer.md |
+| optimizer | .claude/agents/optimizer.md |
 | tech-writer | .claude/agents/tech-writer.md |
 | devops | .claude/agents/devops.md |
+| gitops | .claude/agents/gitops.md |

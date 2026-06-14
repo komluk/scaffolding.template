@@ -18,11 +18,11 @@ claude --dangerously-skip-permissions --no-interactive -p "your prompt"
 
 ```
 .claude/
-├── agents/          # 10 specialized agent definitions
-├── skills/          # 21+ universal skills (auto-injected via frontmatter)
-├── commands/        # 15 slash commands (workflow, OpenSpec, utilities)
+├── agents/          # 11 specialized agent definitions
+├── skills/          # 25 universal skills (auto-injected via frontmatter)
+├── commands/        # 17 slash commands (workflow, OpenSpec, utilities)
 │   └── specs/       # OpenSpec spec-driven development commands
-├── hooks/           # Hook scripts (post-edit-review, pre-commit-validation)
+├── hooks/           # Hook scripts (session-start, staleness, guardrails, review)
 ├── templates/       # Reference templates (output frontmatter, overviews)
 ├── validators/      # Validation scripts (circuit-breaker, output validation)
 ├── output-styles/   # Output formatting (clean-reports)
@@ -32,8 +32,8 @@ claude --dangerously-skip-permissions --no-interactive -p "your prompt"
 
 ## Agents
 
-All 10 agents are available via `Task(subagent_type="agent-name")`:
-analyst, architect, researcher, developer, debugger, reviewer, performance-optimizer, tech-writer, devops, gitops.
+All 11 agents are available via `Task(subagent_type="agent-name")`:
+analyst, architect, researcher, developer, debugger, reviewer, optimizer, tech-writer, devops, gitops, coordinator.
 
 ## Skills
 

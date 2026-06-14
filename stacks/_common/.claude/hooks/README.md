@@ -5,25 +5,42 @@ This directory contains hooks that run automatically during Claude Code workflow
 ## Available Hooks
 
 ### 1. post-edit-review.sh
-**Type:** PostToolUse hook
-**Triggers:** After Edit or Write tool usage
-**Purpose:** Suggests running code review commands after making code changes
-
-**What it does:**
-- Detects when files are modified
-- Suggests relevant review commands (/code-review, /security-review, /test-coverage)
-- Non-blocking (allows edit to proceed)
+**Type:** PostToolUse hook (Edit|Write)
+**Purpose:** Suggests running code review commands after making code changes. Non-blocking (allows edit to proceed).
 
 ### 2. pre-commit-validation.sh
-**Type:** PreToolUse hook (for git commit operations)
-**Triggers:** Before git commit commands
-**Purpose:** Runs validation checks to prevent committing broken code
+**Type:** PreToolUse hook (Bash git commit)
+**Purpose:** Runs validation (`npm run validate` for frontend, `pytest` for backend) before a commit. Blocks the commit if validation fails.
 
-**What it does:**
-- Detects frontend changes → runs `npm run validate`
-- Detects backend changes → runs `pytest`
-- Blocks commit if validation fails
-- Ensures code quality before it enters git history
+### 3. block-force-push.sh
+**Type:** PreToolUse hook (Bash git push)
+**Purpose:** Blocks `--force`/`-f` pushes to protect shared history.
+
+### 4. block-env-write.sh
+**Type:** PreToolUse hook (Edit|Write)
+**Purpose:** Blocks edits/writes to `.env` and other secret files.
+
+### 5. block-destructive-rm.sh
+**Type:** PreToolUse hook (Bash rm)
+**Purpose:** Blocks dangerous recursive/force `rm` invocations.
+
+### 6. file-staleness-check.sh
+**Type:** PreToolUse hook (Edit|Write)
+**Purpose:** Warns/blocks when editing a file whose on-disk state is newer than the last read snapshot.
+
+### 7. file-staleness-update.sh
+**Type:** PostToolUse hook (Edit|Write)
+**Purpose:** Records the post-edit snapshot so staleness checks stay accurate.
+
+### 8. session-start-protocol.sh
+**Type:** SessionStart hook (startup|resume|compact)
+**Purpose:** Injects the scaffolding routing protocol (bare-name agent delegation) into session context via `additionalContext`.
+
+### 9. memory-project-id.sh
+**Type:** SessionStart hook (startup|resume)
+**Purpose:** Derives a stable project id from the git remote for semantic-memory scoping.
+
+> Optional (not shipped/registered by default): `refresh-mcp-token.sh` for environments that pull an MCP bearer token from a local secret store. Add it manually if your project needs it.
 
 ## Hook Configuration
 

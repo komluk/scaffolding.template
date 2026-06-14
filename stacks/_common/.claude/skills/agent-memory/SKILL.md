@@ -1,6 +1,6 @@
 ---
 name: agent-memory
-description: "3-tier persistent memory protocol for cross-session knowledge accumulation. Use when agents need to read, write, or manage memory files."
+description: "3-tier markdown memory protocol (shared/agent/conversation) for cross-session knowledge. TRIGGER when: reading or writing agent memory files, choosing which memory tier an insight belongs in, or starting a task needing prior context. SKIP: vector recall (use semantic-memory-mcp); distilling conversations into candidates (use distill)."
 ---
 
 # Agent Memory Protocol
@@ -80,8 +80,15 @@ Agents with `disallowedTools: Write, Edit` (architect, reviewer) cannot write to
 - Max 200 lines per file (auto-injected memory has 200-line limit)
 - Use markdown headers to organize by topic
 - Include dates `[YYYY-MM-DD]` for time-sensitive entries
+- Tag durable facts with `confidence` (high/medium/low) and `last_verified [YYYY-MM-DD]`; re-verify against live code/config before asserting a stale point-in-time fact, and down-grade or remove ones that no longer hold
 - Remove outdated entries proactively
 - Use concise bullet points, not prose
+
+## Hot/Cold Split
+
+File-based memory (this skill) is the **hot** layer — auto-injected into every agent context under a 200-line budget, so keep it lean: stable, high-level facts and pointers only. Push detailed prose and rarely-needed, fuzzy-discoverable knowledge to the **cold** layer (vector store) via the `semantic-memory-store` skill — it only surfaces on similarity match and carries no per-turn token cost. Durable source-of-truth facts still get a file here; the cold copy is for natural-language recall.
+
+**Local-only carve-out:** secrets and memory/MCP recovery procedures NEVER go to the cold vector store. Recovery info must stay readable when the store itself is down (a 401 means you cannot query the store to learn how to fix it), and secrets must not be embedded in a remote/shared backend. Keep these as file memory only.
 
 ## File Creation
 
@@ -105,3 +112,32 @@ If memory files don't exist, create them with the appropriate header:
 ## Conversation Recall
 
 Conversation memory is always available via file-based recall. When a task runs with a `conversation_id`, the system reads `context.md` and injects it into the agent's context. No database setup is required for conversation-tier memory.
+
+## Learning Loop
+
+The `/learn` command closes the loop between a finished conversation and the
+memory tiers above. It distills one conversation into knowledge candidates (via
+the `distill` skill's Conversation-Scoped Distillation mode) and routes each
+candidate back into this memory system.
+
+### Candidate ingestion into the 3 tiers
+
+| Candidate kind | Target tier | File |
+|----------------|-------------|------|
+| Cross-cutting project fact | Shared | `.scaffolding/agent-memory/shared/KNOWLEDGE.md` |
+| Domain-specific pattern or lesson | Agent | `.scaffolding/agent-memory/agents/{name}/MEMORY.md` |
+| Decision relevant only to the active chain | Conversation | `.scaffolding/conversations/{id}/agent-memory/context.md` |
+
+Ingestion is **propose-then-confirm**: `/learn` prints the proposed memory diff
+and applies it only on explicit confirmation. Writes respect the 200-line
+`KNOWLEDGE.md` limit — overflow routes to the most relevant agent file per the
+`distill` overflow rule. Applied entries become auto-injected context on the next
+task.
+
+### Escalation to /create-skill
+
+If a candidate is a **repeatable procedure** rather than a situational fact (per
+`distill`'s Skill Promotion Criterion), it is not written to memory. Instead
+`/learn` proposes a `/create-skill` invocation with a pre-filled draft, escalating
+the knowledge into a first-class auto-invokable skill. Memory holds facts; skills
+hold reusable how-to procedures.

@@ -1,6 +1,6 @@
 ---
 name: worktree-management
-description: "Scaffolding.tool worktree lifecycle management, diagnostics, and recovery. Use when debugging worktree issues or managing task isolation."
+description: "Scaffolding worktree lifecycle, diagnostics, and recovery. TRIGGER when: debugging worktree isolation, recovering a stuck worktree, or managing task isolation. SKIP: ordinary branch/commit/merge operations (use git-operations)."
 ---
 
 # Worktree Management Skill
@@ -8,11 +8,19 @@ description: "Scaffolding.tool worktree lifecycle management, diagnostics, and r
 ## Purpose
 Scaffolding.tool-specific worktree lifecycle management, diagnostics, and recovery procedures.
 
+## CRITICAL: Only gitops Touches Git
+
+Other agents (developer, architect) do NOT commit. The worktree flow is:
+1. Agent writes code/tests in worktree
+2. **gitops** commits, merges to main, pushes, cleans up
+
+If a worktree has no new commits after an agent finishes, the changes are uncommitted — gitops must commit them BEFORE merge.
+
 ## Worktree Lifecycle
 
 ```
-create_worktree() --> agent executes --> commit_worktree_changes()
-    --> merge_worktree() --> post_merge_git_ops() --> remove_worktree()
+create_worktree() --> agent executes (no commit) --> gitops: commit
+    --> gitops: merge_to_main() --> gitops: push --> gitops: cleanup
 ```
 
 ### States (WorktreeStatus enum)
@@ -67,3 +75,15 @@ cd .scaffolding/worktrees/{task_id[:12]}
 git add -A && git stash
 cd /project/root && git stash pop
 ```
+
+## Post-Finish Cleanup
+
+After a merge or discard finishing action, clean up the worktree:
+
+```bash
+git worktree remove .scaffolding/worktrees/{task_id[:12]} 2>/dev/null
+rm -rf .scaffolding/worktrees/{task_id[:12]}
+git worktree prune
+```
+
+Note: Only needed for **merge** and **discard** actions. PR and keep actions leave the worktree intact.

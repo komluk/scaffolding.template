@@ -1,12 +1,12 @@
 ---
 name: git-operations
-description: "Git command patterns, branching strategies, and safety protocols. Use for branch management, conflict resolution, or worktree operations."
+description: "Git command patterns, branching strategy, and safety protocols. TRIGGER when: managing branches, resolving merge conflicts, or running commit/merge/push operations. SKIP: worktree lifecycle and isolation recovery (use worktree-management); CI automation (use github-actions-template)."
 ---
 
 # Git Operations Skill
 
 ## Purpose
-Core git command patterns, branching strategies, and safety protocols for the scaffolding.tool platform.
+Core git command patterns, branching strategies, and safety protocols for a project.
 
 ## Branching Convention
 
@@ -75,3 +75,38 @@ git log --oneline origin/main..HEAD  # should be empty
 - Always verify unpushed commits BEFORE push
 - Always verify push success AFTER push
 - If push fails due to divergence, report to user -- do NOT auto-rebase
+
+## Finishing Flow
+
+After work is complete on a branch, execute one of these four actions based on context.
+
+### Merge to Main
+```bash
+git checkout main
+git merge --ff-only <branch>  # try fast-forward first
+# if ff fails: git merge --no-ff <branch>
+git branch -d <branch>
+git worktree remove .scaffolding/worktrees/<task_id> 2>/dev/null
+git worktree prune
+```
+
+### Create PR
+```bash
+git push -u origin <branch>
+gh pr create --title "<title>" --body "<body>"
+# keep branch and worktree
+```
+
+### Keep Branch
+```bash
+# no action needed -- branch stays as-is
+git push -u origin <branch>  # optional: push to remote for safety
+```
+
+### Discard Branch
+```bash
+git checkout main
+git worktree remove .scaffolding/worktrees/<task_id> 2>/dev/null
+git branch -D <branch>
+git worktree prune
+```

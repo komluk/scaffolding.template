@@ -1,6 +1,6 @@
 ---
 name: spec-design
-description: "How to write OpenSpec design.md and tasks.md artifacts"
+description: "Write OpenSpec design.md and tasks.md artifacts. TRIGGER when: producing a technical design or task checklist for a spec-driven feature. SKIP: writing proposal.md (use spec-research); executing tasks.md (use spec-develop)."
 ---
 
 # OpenSpec Design & Tasks Writing
@@ -91,14 +91,14 @@ Write to: `{specs_path}/tasks.md`
 
 ```markdown
 ## 1. Setup
-- [ ] 1.1 Create `app/backend/app/feature/` module structure
+- [ ] 1.1 Create `./backend` module structure
 - [ ] 1.2 Add dependencies to `requirements.txt`
 
 ## 2. Core Implementation
-- [ ] 2.1 Implement service in `app/backend/app/feature/service.py`
-- [ ] 2.2 Add Pydantic schemas in `app/backend/app/feature/schemas.py`
-- [ ] 2.3 Add router in `app/backend/app/feature/router.py`
-- [ ] 2.4 Run validation: `<project validation command>`
+- [ ] 2.1 Implement service in `./backend/service.py`
+- [ ] 2.2 Add Pydantic schemas in `./backend/schemas.py`
+- [ ] 2.3 Add router in `./backend/router.py`
+- [ ] 2.4 Run validation: `pytest`
 
 ## 3. Frontend + Tests
 - [ ] 3.1 Add types to `app/frontend/src/types/index.ts`

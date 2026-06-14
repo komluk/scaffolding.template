@@ -54,8 +54,10 @@ Is this CODE? -YES-> Bug fix? -YES-> debugger -> developer
                      └-NO-> RESEARCH? -YES-> researcher
                             └-NO-> REVIEW? -YES-> reviewer (includes security)
                                    └-NO-> CI/CD? -YES-> devops
-                                          └-NO-> DATABASE/PERF? -YES-> performance-optimizer
-                                                 └-NO-> architect (includes API design)
+                                          └-NO-> DATABASE/PERF? -YES-> optimizer
+                                                 └-NO-> GIT/MERGE/PUSH? -YES-> gitops
+                                                        └-NO-> MULTI-AGENT DECOMP? -YES-> coordinator
+                                                               └-NO-> architect (includes API design)
 ```
 
 ### Agent Selection Guide
@@ -74,7 +76,9 @@ Is this CODE? -YES-> Bug fix? -YES-> debugger -> developer
 | Complex multi-agent task | `architect` |
 | API design, OpenAPI | `architect` |
 | Create plan from research | `architect` |
-| Performance, database, queries | `performance-optimizer` |
+| Performance, database, queries | `optimizer` |
+| Git operations, merge, push | `gitops` |
+| Multi-agent task decomposition | `coordinator` |
 
 ## Project Structure
 

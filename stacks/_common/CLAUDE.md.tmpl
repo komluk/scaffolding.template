@@ -39,7 +39,7 @@
 
 ---
 
-## Agents (10)
+## Agents (11)
 
 Route via Task tool with `subagent_type`:
 
@@ -55,10 +55,11 @@ Task(subagent_type="agent-name", prompt="Your task prompt here")
 | **developer** | Implementation, bug fixes, features, tests, UI/styling (gate: validation passes) |
 | **debugger** | Bug reports, unexpected behavior, errors |
 | **reviewer** | After code changes, security analysis, threat modeling (gate: no criticals) |
-| **performance-optimizer** | Performance issues, database design, schema, migrations, queries |
+| **optimizer** | Performance issues, database design, schema, migrations, queries |
 | **tech-writer** | Documentation, CHANGELOG updates |
 | **devops** | CI/CD, deployment, infrastructure |
 | **gitops** | Branch management, conflict resolution, git history, worktree recovery, push to remote |
+| **coordinator** | Analyzes tasks, decomposes into agent step sequences for dynamic execution |
 
 ---
 
@@ -76,8 +77,9 @@ Task(subagent_type="agent-name", prompt="Your task prompt here")
 - Planning / ambiguous request -> analyst
 - Review / security -> reviewer
 - CI/CD -> devops
-- Database / performance -> performance-optimizer
+- Database / performance -> optimizer
 - Git operations / worktree / commit -> gitops
+- Multi-agent coordination / dynamic task decomposition -> coordinator
 - Default -> analyst
 
 ---
@@ -117,7 +119,7 @@ Task(
 
 **Available subagent_type values:**
 - analyst, architect, researcher, developer
-- debugger, reviewer, performance-optimizer, tech-writer, devops, gitops
+- debugger, reviewer, optimizer, tech-writer, devops, gitops, coordinator
 
 **Note:** Backend uses `--dangerously-skip-permissions` so Task tool subagents have full Edit/Write access.
 
@@ -147,7 +149,7 @@ Task(
 
 - **Skills** (`.claude/skills/`): Auto-injected via `skills:` frontmatter. No manual loading needed.
 - **Commands** (`.claude/commands/`): Use `/workflow run <name> <desc>` for explicit workflow selection.
-- **Hooks** (`settings.json`): `SessionStart(compact)`, `PostToolUse(Edit|Write)`, `PreToolUse(git commit)`.
+- **Hooks** (`settings.json`): `SessionStart(startup|resume|compact)`, `PostToolUse(Edit|Write)`, `PreToolUse(git commit|git push|rm|Edit|Write)`.
 - **Guardrails** (frontmatter): `maxTurns` (15-50), `disallowedTools`, `memory: project`.
 
 ---

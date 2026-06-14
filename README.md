@@ -16,7 +16,7 @@ Project template for the [scaffolding.tool](https://github.com/komluk/scaffoldin
 
 Every new project receives the full `stacks/_common/` contents plus its stack-specific overlay. This includes:
 
-### 10 Specialized Agents
+### 11 Specialized Agents
 
 All agents are defined in `stacks/_common/.claude/agents/` and are available via the Claude Code Task tool:
 
@@ -28,23 +28,24 @@ All agents are defined in `stacks/_common/.claude/agents/` and are available via
 | **developer** | Implementation, bug fixes, features, tests, UI/styling |
 | **debugger** | Bug reports, unexpected behavior, error diagnosis |
 | **reviewer** | Code review, security analysis, threat modeling |
-| **performance-optimizer** | Performance tuning, database design, query optimization |
+| **optimizer** | Performance tuning, database design, query optimization |
 | **tech-writer** | Documentation, README, CHANGELOG maintenance |
 | **devops** | CI/CD, Docker, deployment, infrastructure |
 | **gitops** | Branch management, conflict resolution, git history |
+| **coordinator** | Task decomposition / multi-agent orchestration |
 
-### 26 Skills (21 Universal + Stack-Specific)
+### 30 Skills (25 Universal + Stack-Specific)
 
 Skills are auto-injected into agents via frontmatter. Located in `stacks/_common/.claude/skills/`:
 
-**Universal skills (21):**
-agent-memory, api-design, context-engineering, database-optimization, docker-templates, error-handling, git-operations, github-actions-template, logging-standards, mcp-tools, monitoring-observability, pattern-recognition, planning-methodology, quality-validation, research-methodology, security-review-checklists, spec-design, spec-develop, spec-research, spec-review, spec-workflow, testing-strategy, worktree-management
+**Universal skills (25):**
+agent-comms, agent-memory, api-design, context-engineering, database-optimization, docker-templates, error-handling, git-operations, github-actions-template, logging-standards, mcp-tools, monitoring-observability, pattern-recognition, planning-methodology, quality-validation, research-methodology, security-review-checklists, semantic-memory-mcp, spec-design, spec-develop, spec-research, spec-review, spec-workflow, testing-strategy, worktree-management
 
-**Stack-specific skills:**
-- React: mui-styling, react-patterns, state-management (`stacks/react/.claude/skills/`)
-- Python: python-patterns (`stacks/python/.claude/skills/`)
+**Stack-specific skills (5):**
+- React (4): mui-styling, react-patterns, state-management, ui-ux-pro-max (`stacks/react/.claude/skills/`)
+- Python (1): python-patterns (`stacks/python/.claude/skills/`)
 
-### 15 Slash Commands
+### 17 Slash Commands
 
 Located in `stacks/_common/.claude/commands/`:
 
@@ -52,9 +53,11 @@ Located in `stacks/_common/.claude/commands/`:
 |---------|---------|
 | `/workflow` | Run the full agent chain (analyst -> architect -> developer -> reviewer -> tech-writer -> gitops) |
 | `/context` | Load project context and routing rules |
+| `/create-skill` | Author a new skill with description frontmatter |
+| `/init-scaffolding` | Initialize the scaffolding structure in a project |
 | `/init-openspec` | Initialize OpenSpec in a project |
-| `/generate-prp` | Generate a PRP (Prompt Routing Plan) |
-| `/execute-prp` | Execute a generated PRP |
+| `/learn` | Capture learnings into agent memory |
+| `/memory` | Inspect and manage agent/semantic memory |
 | `/specs:new` | Start a new spec-driven change |
 | `/specs:ff` | Fast-forward: generate all spec artifacts at once |
 | `/specs:apply` | Implement tasks from specs |
@@ -99,9 +102,9 @@ scaffolding.template/
   stacks/
     _common/                          # Shared across all stacks
       .claude/
-        agents/                       # 10 agent definitions
-        skills/                       # 21 universal skills
-        commands/                     # 15 slash commands
+        agents/                       # 11 agent definitions
+        skills/                       # 25 universal skills
+        commands/                     # 17 slash commands
           specs/                      # OpenSpec commands
         hooks/                        # Hook scripts
         templates/                    # Reference templates
@@ -177,16 +180,6 @@ devops/scripts/build-init-images.sh --no-push react
 # Build and push all stacks
 devops/scripts/build-init-images.sh
 ```
-
-## Known Issues (Pending Fixes)
-
-The following items were identified during the sync review and still need to be addressed:
-
-1. **CLAUDE.md.tmpl not fully rewritten** -- The template still uses `/opsx:` command prefix (should be `/specs:`), lists only 9 agents (missing `analyst`), and lacks several sections present in the current scaffolding.tool CLAUDE.md (Workflow Chain, Large Edit Prevention, Skills/Commands/Hooks).
-
-2. **settings.json missing hooks and deny rules** -- The settings file has only a minimal `PreCompact` hook. It needs PostToolUse (post-edit-review), PreToolUse (pre-commit-validation), and SessionStart hooks. It also needs `permissions.deny` rules to block reads of venv/node_modules directories, an `env` section for `BASH_DEFAULT_TIMEOUT_MS`, and `skipDangerousModePermissionPrompt`.
-
-3. **schema.yaml references outdated pipeline** -- The OpenSpec workflow schema description says "9-agent pipeline" (should be 10) and the apply instruction references `venv_linux` as the sole Python venv path (should use portable multi-venv detection).
 
 ## Contributing
 

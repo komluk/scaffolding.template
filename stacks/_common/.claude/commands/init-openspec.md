@@ -1,3 +1,8 @@
+---
+name: init-openspec
+description: Initialize OpenSpec in a project directory with the scaffolding-workflow schema.
+---
+
 # /init-openspec Command
 
 Initialize OpenSpec in a project directory with the scaffolding-workflow schema.
@@ -36,7 +41,7 @@ Sets up OpenSpec spec-driven development tooling in a project:
    openspec schema fork spec-driven scaffolding-workflow
    ```
    Then replace the generated schema with the customized version from:
-   `.scaffolding/openspec/schemas/scaffolding-workflow/schema.yaml` (if a project-specific schema exists)
+   `./schemas/scaffolding-workflow/schema.yaml`
 
 4. **Create the conversations directory**
    ```bash
